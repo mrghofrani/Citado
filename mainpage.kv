@@ -1,0 +1,77 @@
+<MainLayout>:
+    orientation: 'vertical'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            orientation: 'vertical'
+            id: title
+            text: 'Citado'
+            font_size: 150
+
+        Label:
+            orientation: 'vertical'
+            id: mode
+            text: 'Choose Your Use Mode'
+            font_size: 30
+
+    GridLayout:
+        rows: 2
+        cols: 2
+        padding: 10
+        spacing: 10
+
+        Button:
+            id: manage_db
+            text: 'Manage DB'
+            on_press: print("Pressed")
+
+        Button:
+            id: order_food
+            text: 'Order Food'
+            on_release: root.btn()
+
+        Button:
+            id: view_reports
+            text: 'View Reports'
+
+        Button:
+            id: order_raw_material
+            text: 'Order Raw Material'
+
+<OrderPopUp>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            id: customer
+            text: 'Customer'
+        Spinner:
+            text: 'Home'
+            values: 'Home', 'Work', 'Other', 'Custom'
+
+    BoxLayout:
+        Label:
+            id: address
+            text: 'Address'
+
+        Spinner:
+            text: 'Home'
+            values: 'Home', 'Work', 'Other', 'Custom'
+
+    BoxLayout:
+        Label:
+            id: bike_delivery
+            text: 'Bike delivery'
+
+        Spinner:
+            text: 'Home'
+            values: 'Home', 'Work', 'Other', 'Custom'
+
+    BoxLayout:
+        Button:
+            id: order_submit
+            text: "Submit"
+
+        Button:
+            id: order_cancel
+            text: "Cancel"
+            release: lambda *args: self.popup_exit.dismiss()
