@@ -4,11 +4,18 @@ from kivy.uix.popup import Popup
 
 
 class MainLayout(BoxLayout):
-    def btn(self):
-        show_order_popup()
+    def order_food_button(self):
+        show_food_order_popup()
+
+    def order_raw_material_button(self):
+        show_raw_material_order_popup()
 
 
-class OrderPopUp(BoxLayout):
+class FoodOrderPopUp(BoxLayout):
+    pass
+
+
+class RawMaterialOrderPopUp(BoxLayout):
     pass
 
 
@@ -17,12 +24,17 @@ class MainPage(App):
         return MainLayout()
 
 
-def show_order_popup():
-    show = OrderPopUp()
+def show_food_order_popup():
+    show = FoodOrderPopUp()
     popup_window = Popup(title="Order Food", content=show)
-    if show is None:
-        print("yes")
-    show.ids['order_cancel'].bind(on_press=popup_window.dismiss)
+    show.ids['food_order_cancel'].bind(on_press=popup_window.dismiss)
+    popup_window.open()
+
+
+def show_raw_material_order_popup():
+    show = RawMaterialOrderPopUp()
+    popup_window = Popup(title="Order Raw Material", content=show)
+    show.ids['raw_material_order_cancel'].bind(on_press=popup_window.dismiss)
     popup_window.open()
 
 
