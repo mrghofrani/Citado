@@ -15,7 +15,7 @@
             font_size: 30
 
     GridLayout:
-        rows: 2
+        rows: 3
         cols: 2
         padding: 10
         spacing: 10
@@ -38,6 +38,68 @@
             id: order_raw_material
             text: 'Order Raw Material'
             on_release: root.order_raw_material_button()
+
+        GridLayout:
+            rows: 2
+            cols: 3
+            padding: 2
+            spacing: 2
+
+            Button:
+                id: insert_to_customer
+                text: 'Add customer'
+                on_release: root.insert_customer_button()
+
+            Button:
+                id: insert_to_bike
+                text: 'Add Biker'
+
+            Button:
+                id: insert_to_store
+                text: 'Add store'
+
+            Button:
+                id: insert_to_address
+                text: 'Add address'
+
+            Button:
+                id: insert_to_food
+                text: 'Add food'
+
+            Button:
+                id: insert_to_sth
+                text: 'Add sth'
+
+        GridLayout:
+            rows: 2
+            cols: 3
+            padding: 2
+            spacing: 2
+
+            Button:
+                id: delete_customer
+                text: 'Delete customer'
+
+            Button:
+                id: delete_bike
+                text: 'Delete Biker'
+
+            Button:
+                id: delete_store
+                text: 'Delete store'
+
+            Button:
+                id: delete_address
+                text: 'Delete address'
+
+            Button:
+                id: delete_food
+                text: 'Delete food'
+
+            Button:
+                id: delete_sth
+                text: 'Delete sth'
+
 
 <FoodOrderPopUp>:
     orientation: 'vertical'
