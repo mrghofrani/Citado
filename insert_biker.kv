@@ -1,0 +1,41 @@
+<InsertBikerPopUp>:
+    orientation: 'vertical'
+    BoxLayout:
+        id: nationalCode
+        Label:
+            text: 'National Code'
+        TextInput:
+            id: bikerNationalCodeInput
+            multiline: False
+            text: 'default'
+
+    BoxLayout:
+        Label:
+            text: 'First Name'
+        TextInput:
+            id: bikerFirstName
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Last Name'
+        TextInput:
+            id: bikerLastName
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Mobile Number'
+        TextInput:
+            id: bikerMobileNumber
+            multiline: False
+
+    BoxLayout:
+        Button:
+            id: insertBikerSubmit
+            text: "Submit"
+            on_release: root.submit()
+
+        Button:
+            id: insertBikerCancel
+            text: "Cancel"

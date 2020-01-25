@@ -1,0 +1,32 @@
+<InsertAddressPopUp>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'Phone number'
+        TextInput:
+            id: addressPhoneNumber
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Name'
+        TextInput:
+            id: addressName
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Address'
+        TextInput:
+            id: addressAddress
+            multiline: False
+
+    BoxLayout:
+        Button:
+            id: insertAddressSubmit
+            text: "Submit"
+            on_release: root.submit()
+
+        Button:
+            id: insertAddressCancel
+            text: "Cancel"
