@@ -248,6 +248,81 @@ def show_update_customer_popup():
     popup_window.open()
 
 
+# ---------- Update Address -------------
+Builder.load_file('update_address.kv')
+
+
+class UpdateAddressPopUp(BoxLayout):
+
+    def __int__(self):
+        super(BoxLayout, self).__init__()
+        self.address_list = []
+
+    def pick_values(self):
+        connection = get_connection()
+        postgres_insert_query = "SELECT * FROM address"
+        address_id_list = []
+        try:
+            cursor = connection.cursor()
+            cursor.execute(postgres_insert_query)
+            self.address_list = cursor.fetchall()
+            address_id_list = []
+            for row in self.address_list:
+                address_id_list.append(row[0])
+
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to fetch record into address table ", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
+        return address_id_list
+
+    def update_form(self):
+        if self.address_list:
+            selected_id = self.ids.address_selector.text
+            row = tuple()
+            for i, v in enumerate(self.address_list):
+                if v[0] == selected_id:
+                    row = v
+            self.ids.addressName.text = row[1]
+            self.ids.addressAddress.text = row[2]
+
+    def submit(self):
+        phone_number = self.ids.address_selector.text
+        name = self.ids.addressName.text
+        address = self.ids.addressAddress.text
+        connection, cursor = None, None
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            sql_update_query = """UPDATE address
+                                  SET name = %s, address = %s
+                                  WHERE phone = %s"""
+            cursor.execute(sql_update_query, (name, address, phone_number))
+            connection.commit()
+            count = cursor.rowcount
+            print(count, "Record Updated successfully ")
+
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to update record into address table ", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
+
+
+def show_update_address_popup():
+    show = UpdateAddressPopUp()
+    popup_window = Popup(title="Update Address", content=show)
+    show.ids['update_address_cancel'].bind(on_press=popup_window.dismiss)
+    popup_window.open()
+
+
 # ------------------------------ #
 #         Deletion Part          #
 # ------------------------------ #
@@ -330,6 +405,7 @@ class MainLayout(BoxLayout):
     def order_raw_material_button(self):
         show_raw_material_order_popup()
 
+# ------- Insertion ------
     def insert_customer_button(self):
         show_insert_customer_popup()
 
@@ -339,9 +415,14 @@ class MainLayout(BoxLayout):
     def insert_address_button(self):
         show_insert_address_popup()
 
+# ------- Update -------
     def update_customer_button(self):
         show_update_customer_popup()
 
+    def update_address_button(self):
+        show_update_address_popup()
+
+# -------- Delete -------
     def delete_customer_button(self):
         show_delete_customer_popup()
 

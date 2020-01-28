@@ -1,0 +1,34 @@
+<UpdateAddressPopUp>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'Phone number'
+        Spinner:
+            id: address_selector
+            text: 'Choose An Address'
+            values: root.pick_values()
+            on_text: root.update_form()
+
+    BoxLayout:
+        Label:
+            text: 'Name'
+        TextInput:
+            id: addressName
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Address'
+        TextInput:
+            id: addressAddress
+            multiline: False
+
+    BoxLayout:
+        Button:
+            id: update_submit_submit
+            text: "Submit"
+            on_release: root.submit()
+
+        Button:
+            id: update_address_cancel
+            text: "Cancel"
