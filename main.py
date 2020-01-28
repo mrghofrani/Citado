@@ -214,7 +214,6 @@ class UpdateCustomerPopUp(BoxLayout):
         self.ids.customerMobileNumber.text = row[3]  # Mobile number of Customer
         self.ids.customerAge.text = str(row[4])  # Age of Customer
 
-
     def submit(self):
         national_code = self.ids.customer_selector.text
         first_name = self.ids.customerFirstName.text
@@ -249,6 +248,79 @@ def show_update_customer_popup():
     popup_window.open()
 
 
+# ------------------------------ #
+#         Deletion Part          #
+# ------------------------------ #
+
+Builder.load_file('delete_customer.kv')
+
+
+class DeleteCustomerPopUp(BoxLayout):
+
+    def __int__(self):
+        super(BoxLayout, self).__init__()
+        self.customer_list = []
+
+    def pick_values(self):
+        connection = get_connection()
+        postgres_insert_query = "SELECT * FROM customer"
+        try:
+            cursor = connection.cursor()
+            cursor.execute(postgres_insert_query)
+            self.customer_list = cursor.fetchall()
+            customer_id_list = []
+            for row in self.customer_list:
+                customer_id_list.append(row[0])
+
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to fetch record into address table ", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
+        return customer_id_list
+
+    def update_form(self):
+        selected_id = self.ids.customer_selector.text
+        row = tuple()
+        for i, v in enumerate(self.customer_list):
+            if v[0] == selected_id:
+                row = v
+        self.ids.customerFirstName.text = row[1]  # First Name of Customer
+        self.ids.customerLastName.text = row[2]  # Last Name of Customer
+        self.ids.customerMobileNumber.text = row[3]  # Mobile number of Customer
+        self.ids.customerAge.text = str(row[4])  # Age of Customer
+
+    def delete(self):
+        national_code = self.ids.customer_selector.text
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            sql_delete_query = """DELETE FROM customer
+                                  WHERE national_code = %s"""
+            cursor.execute(sql_delete_query, (national_code, ))
+            connection.commit()
+            count = cursor.rowcount
+            print(count, "Record Deleted successfully ")
+
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to update record into address table ", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
+
+
+def show_delete_customer_popup():
+    show = DeleteCustomerPopUp()
+    popup_window = Popup(title="Delete Customer", content=show)
+    show.ids['delete_customer_cancel'].bind(on_press=popup_window.dismiss)
+    popup_window.open()
+
 
 # ---- Main Page -------- #
 class MainLayout(BoxLayout):
@@ -269,6 +341,9 @@ class MainLayout(BoxLayout):
 
     def update_customer_button(self):
         show_update_customer_popup()
+
+    def delete_customer_button(self):
+        show_delete_customer_popup()
 
 
 class MainPage(App):

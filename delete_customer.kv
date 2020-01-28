@@ -1,0 +1,50 @@
+<DeleteCustomerPopUp>:
+    orientation: 'vertical'
+    BoxLayout:
+        id: nationalCode
+        Label:
+            text: 'National Code'
+        Spinner:
+            id: customer_selector
+            text: 'Choose Someone'
+            values: root.pick_values()
+            on_text: root.update_form()
+
+
+    BoxLayout:
+        Label:
+            text: 'First Name'
+        Label:
+            id: customerFirstName
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Last Name'
+        Label:
+            id: customerLastName
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Mobile Number'
+        Label:
+            id: customerMobileNumber
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Age'
+        Label:
+            id: customerAge
+            multiline: False
+
+    BoxLayout:
+        Button:
+            id: delete_customer_submit
+            text: "Delete"
+            on_release: root.delete()
+
+        Button:
+            id: delete_customer_cancel
+            text: "Cancel"
