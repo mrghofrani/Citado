@@ -1,4 +1,4 @@
-<UpdateAddressPopUp>:
+<DeleteAddressPopUp>:
     orientation: 'vertical'
     BoxLayout:
         Label:
@@ -12,23 +12,22 @@
     BoxLayout:
         Label:
             text: 'Name'
-        TextInput:
+        Label:
             id: addressName
             multiline: False
 
     BoxLayout:
         Label:
             text: 'Address'
-        TextInput:
+        Label:
             id: addressAddress
             multiline: False
 
     BoxLayout:
         Button:
-            id: update_submit
-            text: "Submit"
-            on_release: root.submit()
+            text: "Delete"
+            on_release: root.delete()
 
         Button:
-            id: update_address_cancel
+            id: delete_address_cancel
             text: "Cancel"
