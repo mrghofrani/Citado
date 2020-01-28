@@ -1,0 +1,50 @@
+<UpdateCustomerPopUp>:
+    orientation: 'vertical'
+    BoxLayout:
+        id: nationalCode
+        Label:
+            text: 'National Code'
+        Spinner:
+            id: customer_selector
+            text: 'Choose Someone'
+            values: root.pick_values()
+            on_text: root.update_form()
+
+
+    BoxLayout:
+        Label:
+            text: 'First Name'
+        TextInput:
+            id: customerFirstName
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Last Name'
+        TextInput:
+            id: customerLastName
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Mobile Number'
+        TextInput:
+            id: customerMobileNumber
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Age'
+        TextInput:
+            id: customerAge
+            multiline: False
+
+    BoxLayout:
+        Button:
+            id: update_customer_submit
+            text: "Submit"
+            on_release: root.submit()
+
+        Button:
+            id: update_customer_cancel
+            text: "Cancel"

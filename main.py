@@ -7,9 +7,6 @@ from kivy.lang import Builder
 
 from datetime import datetime
 
-Builder.load_file('insert_customer.kv')
-Builder.load_file('insert_biker.kv')
-Builder.load_file('insert_address.kv')
 
 
 def get_connection():
@@ -19,30 +16,41 @@ def get_connection():
                                     port="5432",
                                     database="citado")
 
-
-class MainLayout(BoxLayout):
-    def order_food_button(self):
-        show_food_order_popup()
-
-    def order_raw_material_button(self):
-        show_raw_material_order_popup()
-
-    def insert_customer_button(self):
-        show_insert_customer_popup()
-
-    def insert_biker_button(self):
-        show_insert_biker_popup()
-
-    def insert_address_button(self):
-        show_insert_address_popup()
+# ------------------- #
+#   Ordering Part     #
+# ------------------- #
 
 
+# ---- Food Order ----#
 class FoodOrderPopUp(BoxLayout):
     pass
 
 
+def show_food_order_popup():
+    show = FoodOrderPopUp()
+    popup_window = Popup(title="Order Food", content=show)
+    show.ids['food_order_cancel'].bind(on_press=popup_window.dismiss)
+    popup_window.open()
+
+
+# ---- Raw Material Order -----#
 class RawMaterialOrderPopUp(BoxLayout):
     pass
+
+
+def show_raw_material_order_popup():
+    show = RawMaterialOrderPopUp()
+    popup_window = Popup(title="Order Raw Material", content=show)
+    show.ids['raw_material_order_cancel'].bind(on_press=popup_window.dismiss)
+    popup_window.open()
+
+
+# =================== #
+#   Insertion Part    #
+# =================== #
+
+# ------ Insert Customer ------ #
+Builder.load_file('insert_customer.kv')
 
 
 class InsertCustomerPopUp(BoxLayout):
@@ -74,6 +82,17 @@ class InsertCustomerPopUp(BoxLayout):
                 connection.close()
 
 
+def show_insert_customer_popup():
+    show = InsertCustomerPopUp()
+    popup_window = Popup(title="Insert cutomer", content=show)
+    show.ids['insert_customer_cancel'].bind(on_press=popup_window.dismiss)
+    popup_window.open()
+
+
+# ---- Insert Biker ---- #
+Builder.load_file('insert_biker.kv')
+
+
 class InsertBikerPopUp(BoxLayout):
     def submit(self):
         national_code = self.ids.bikerNationalCodeInput.text
@@ -100,6 +119,17 @@ class InsertBikerPopUp(BoxLayout):
             if connection:
                 cursor.close()
                 connection.close()
+
+
+def show_insert_biker_popup():
+    show = InsertBikerPopUp()
+    popup_window = Popup(title="Insert biker", content=show)
+    show.ids['insertBikerCancel'].bind(on_press=popup_window.dismiss)
+    popup_window.open()
+
+
+# ---- insert Address ---- #
+Builder.load_file('insert_address.kv')
 
 
 class InsertAddressPopUp(BoxLayout):
@@ -129,44 +159,121 @@ class InsertAddressPopUp(BoxLayout):
                 connection.close()
 
 
-class MainPage(App):
-    def build(self):
-        return MainLayout()
-
-
-def show_food_order_popup():
-    show = FoodOrderPopUp()
-    popup_window = Popup(title="Order Food", content=show)
-    show.ids['food_order_cancel'].bind(on_press=popup_window.dismiss)
-    popup_window.open()
-
-
-def show_raw_material_order_popup():
-    show = RawMaterialOrderPopUp()
-    popup_window = Popup(title="Order Raw Material", content=show)
-    show.ids['raw_material_order_cancel'].bind(on_press=popup_window.dismiss)
-    popup_window.open()
-
-
-def show_insert_customer_popup():
-    show = InsertCustomerPopUp()
-    popup_window = Popup(title="Insert cutomer", content=show)
-    show.ids['insert_customer_cancel'].bind(on_press=popup_window.dismiss)
-    popup_window.open()
-
-
-def show_insert_biker_popup():
-    show = InsertBikerPopUp()
-    popup_window = Popup(title="Insert biker", content=show)
-    show.ids['insertBikerCancel'].bind(on_press=popup_window.dismiss)
-    popup_window.open()
-
-
 def show_insert_address_popup():
     show = InsertAddressPopUp()
     popup_window = Popup(title="Insert Address", content=show)
     show.ids['insertAddressCancel'].bind(on_press=popup_window.dismiss)
     popup_window.open()
+
+
+# ------------------------------ #
+#         Update Part            #
+# -------------------------------#
+
+# ------ update Customer --------
+
+Builder.load_file('update_customer.kv')
+
+
+class UpdateCustomerPopUp(BoxLayout):
+
+    def __int__(self):
+        super(BoxLayout, self).__init__()
+        self.customer_list = []
+
+    def pick_values(self):
+        connection = get_connection()
+        postgres_insert_query = "SELECT * FROM customer"
+        try:
+            cursor = connection.cursor()
+            cursor.execute(postgres_insert_query)
+            print("Selecting rows from mobile table using cursor.fetchall")
+            self.customer_list = cursor.fetchall()
+            customer_id_list = []
+            for row in self.customer_list:
+                customer_id_list.append(row[0])
+
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to fetch record into address table ", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
+        return customer_id_list
+
+    def update_form(self):
+        selected_id = self.ids.customer_selector.text
+        row = tuple()
+        for i, v in enumerate(self.customer_list):
+            if v[0] == selected_id:
+                row = v
+        self.ids.customerFirstName.text = row[1]  # First Name of Customer
+        self.ids.customerLastName.text = row[2]  # Last Name of Customer
+        self.ids.customerMobileNumber.text = row[3]  # Mobile number of Customer
+        self.ids.customerAge.text = str(row[4])  # Age of Customer
+
+
+    def submit(self):
+        national_code = self.ids.customer_selector.text
+        first_name = self.ids.customerFirstName.text
+        last_name = self.ids.customerLastName.text
+        mobile_number = self.ids.customerMobileNumber.text
+        age = self.ids.customerAge.text
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            sql_update_query = """UPDATE customer
+                                  SET first_name = %s, last_name = %s, mobile_number = %s, age = %s
+                                  WHERE national_code = %s"""
+            cursor.execute(sql_update_query, (first_name, last_name, mobile_number, age, national_code))
+            connection.commit()
+            count = cursor.rowcount
+            print(count, "Record Updated successfully ")
+
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to update record into address table ", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
+
+
+def show_update_customer_popup():
+    show = UpdateCustomerPopUp()
+    popup_window = Popup(title="Update Customer", content=show)
+    show.ids['update_customer_cancel'].bind(on_press=popup_window.dismiss)
+    popup_window.open()
+
+
+
+# ---- Main Page -------- #
+class MainLayout(BoxLayout):
+    def order_food_button(self):
+        show_food_order_popup()
+
+    def order_raw_material_button(self):
+        show_raw_material_order_popup()
+
+    def insert_customer_button(self):
+        show_insert_customer_popup()
+
+    def insert_biker_button(self):
+        show_insert_biker_popup()
+
+    def insert_address_button(self):
+        show_insert_address_popup()
+
+    def update_customer_button(self):
+        show_update_customer_popup()
+
+
+class MainPage(App):
+    def build(self):
+        return MainLayout()
 
 
 if __name__ == "__main__":
