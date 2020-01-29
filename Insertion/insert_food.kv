@@ -1,0 +1,53 @@
+<InsertFoodPopUp>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'Food Name'
+        TextInput:
+            id: name
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Food start time'
+        TextInput:
+            id: food_start_time
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Food end time'
+        TextInput:
+            id: food_end_time
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Price'
+        TextInput:
+            id: price
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Price start time'
+        TextInput:
+            id: price_start_time
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Price end time'
+        TextInput:
+            id: price_end_time
+            multiline: False
+
+    BoxLayout:
+        Button:
+            id: insert_food_submit
+            text: "Submit"
+            on_release: root.submit()
+
+        Button:
+            id: insert_food_cancel
+            text: "Cancel"

@@ -50,7 +50,7 @@ def show_raw_material_order_popup():
 # =================== #
 
 # ------ Insert Customer ------ #
-Builder.load_file('insert_customer.kv')
+Builder.load_file('Insertion/insert_customer.kv')
 
 
 class InsertCustomerPopUp(BoxLayout):
@@ -90,7 +90,7 @@ def show_insert_customer_popup():
 
 
 # ---- Insert Biker ---- #
-Builder.load_file('insert_biker.kv')
+Builder.load_file('Insertion/insert_biker.kv')
 
 
 class InsertBikerPopUp(BoxLayout):
@@ -129,7 +129,7 @@ def show_insert_biker_popup():
 
 
 # ---- insert Address ---- #
-Builder.load_file('insert_address.kv')
+Builder.load_file('Insertion/insert_address.kv')
 
 
 class InsertAddressPopUp(BoxLayout):
@@ -163,6 +163,51 @@ def show_insert_address_popup():
     show = InsertAddressPopUp()
     popup_window = Popup(title="Insert Address", content=show)
     show.ids['insertAddressCancel'].bind(on_press=popup_window.dismiss)
+    popup_window.open()
+
+
+# ----------    Insert Food    ----------
+Builder.load_file('Insertion/insert_food.kv')
+
+
+class InsertFoodPopUp(BoxLayout):
+    def submit(self):
+        name = self.ids.name.text
+        name_start_time = self.ids.food_start_time.text
+        name_end_time = self.ids.food_end_time.text
+        price = self.ids.price.text
+        price_start_time = self.ids.price_start_time.text
+        price_end_time = self.ids.price_end_time.text
+
+        postgres_insert_query = """ INSERT INTO food(name, price, name_start_time, name_end_time, price_start_time, price_end_time)
+                                    VALUES (%s, %s, %s, %s, %s, %s) """
+        print(price_end_time)
+
+        values = (name, price, name_start_time, name_end_time, price_start_time, price_end_time)
+        connection, cursor = None, None
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(postgres_insert_query, values)
+
+            connection.commit()
+            count = cursor.rowcount
+            print(count, "Record inserted successfully into food table")
+
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to insert record into food table", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
+
+
+def show_insert_food_popup():
+    show = InsertFoodPopUp()
+    popup_window = Popup(title="Insert food", content=show)
+    show.ids['insert_food_cancel'].bind(on_press=popup_window.dismiss)
     popup_window.open()
 
 
@@ -259,14 +304,14 @@ class UpdateAddressPopUp(BoxLayout):
         self.address_list = []
 
     def pick_values(self):
-        connection = get_connection()
-        postgres_insert_query = "SELECT * FROM address"
         address_id_list = []
+        connection, cursor = None, None
         try:
+            connection = get_connection()
             cursor = connection.cursor()
-            cursor.execute(postgres_insert_query)
+            postgres_query = "SELECT * FROM address"
+            cursor.execute(postgres_query)
             self.address_list = cursor.fetchall()
-            address_id_list = []
             for row in self.address_list:
                 address_id_list.append(row[0])
 
@@ -340,11 +385,12 @@ class DeleteCustomerPopUp(BoxLayout):
     def pick_values(self):
         connection = get_connection()
         postgres_insert_query = "SELECT * FROM customer"
+        connection, cursor = None, None
+        customer_id_list = []
         try:
             cursor = connection.cursor()
             cursor.execute(postgres_insert_query)
             self.customer_list = cursor.fetchall()
-            customer_id_list = []
             for row in self.customer_list:
                 customer_id_list.append(row[0])
 
@@ -488,6 +534,9 @@ class MainLayout(BoxLayout):
 
     def insert_address_button(self):
         show_insert_address_popup()
+
+    def insert_food_button(self):
+        show_insert_food_popup()
 
 # ------- Update -------
     def update_customer_button(self):
