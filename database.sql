@@ -73,10 +73,10 @@ CREATE TABLE delivery(
 );
 
 CREATE TABLE store(
-    id serial,
-    start_time timestamp not null,
-    end_time timestamp not null,
-    PRIMARY KEY (id, start_time)
+    name varchar(128) not null,
+    start_time date not null,
+    end_time date not null,
+    PRIMARY KEY (name, start_time)
 );
 
 CREATE TABLE ingredient(
@@ -88,22 +88,22 @@ CREATE TABLE ingredient(
 );
 
 CREATE TABLE store_ingredient(
-    store_id int,
+    store_name varchar(128),
     store_start_time date,
     ingredient_name varchar(32),
     ingredient_start_time date,
-    FOREIGN KEY (store_id, store_start_time) REFERENCES store,
+    FOREIGN KEY (store_name, store_start_time) REFERENCES store,
     FOREIGN KEY (ingredient_name, ingredient_start_time) REFERENCES  ingredient
 );
 
 CREATE TABLE fact_store(
     factor_id int,
-    store_id int,
+    store_name varchar(128),
     store_start_time date,
     ingredient_name varchar(32),
     ingredient_start_time date,
     FOREIGN KEY (factor_id) REFERENCES factor,
-    FOREIGN KEY (store_id, store_start_time) REFERENCES store,
+    FOREIGN KEY (store_name, store_start_time) REFERENCES store,
     FOREIGN KEY (ingredient_name, ingredient_start_time) REFERENCES ingredient
 );
 

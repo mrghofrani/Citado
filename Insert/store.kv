@@ -1,0 +1,33 @@
+<InsertStorePopUp>:
+    orientation: 'vertical'
+
+    BoxLayout:
+        Label:
+            text: 'Name'
+        TextInput:
+            id: name
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Start time'
+        TextInput:
+            id: start_time
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'End time'
+        TextInput:
+            id: end_time
+            multiline: False
+
+    BoxLayout:
+        Button:
+            id: insert_store_submit
+            text: "Submit"
+            on_release: root.submit()
+
+        Button:
+            id: insert_store_cancel
+            text: "Cancel"

@@ -130,11 +130,13 @@ class InsertAddressPopUp(BoxLayout):
         phone_number = self.ids.addressPhoneNumber.text
         name = self.ids.addressName.text
         address = self.ids.addressAddress.text
-        connection = get_connection()
-        postgres_insert_query = " INSERT INTO address(phone, name, address) VALUES (%s,%s,%s) "
 
+        postgres_insert_query = " INSERT INTO address(phone, name, address) VALUES (%s,%s,%s) "
         values = (phone_number, name, address)
+
+        connection, cursor = None, None
         try:
+            connection = get_connection()
             cursor = connection.cursor()
             cursor.execute(postgres_insert_query, values)
 
@@ -174,7 +176,6 @@ class InsertFoodPopUp(BoxLayout):
 
         postgres_insert_query = """ INSERT INTO food(name, price, name_start_time, name_end_time, price_start_time, price_end_time)
                                     VALUES (%s, %s, %s, %s, %s, %s) """
-        print(price_end_time)
 
         values = (name, price, name_start_time, name_end_time, price_start_time, price_end_time)
         connection, cursor = None, None
@@ -203,6 +204,46 @@ def show_insert_food_popup():
     show.ids['insert_food_cancel'].bind(on_press=popup_window.dismiss)
     popup_window.open()
 
+
+# ----------    Insert Store    ----------
+Builder.load_file('Insert/store.kv')
+
+
+class InsertStorePopUp(BoxLayout):
+    def submit(self):
+        name = self.ids.name.text
+        start_time = self.ids.start_time.text
+        end_time = self.ids.end_time.text
+
+        postgres_insert_query = """ INSERT INTO store(name, start_time, end_time)
+                                    VALUES (%s, %s, %s) """
+
+        values = (name, start_time, end_time)
+        connection, cursor = None, None
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(postgres_insert_query, values)
+
+            connection.commit()
+            count = cursor.rowcount
+            print(count, "Record inserted successfully into food table")
+
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to insert record into food table", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
+
+
+def show_insert_store_popup():
+    show = InsertStorePopUp()
+    popup_window = Popup(title="Insert store", content=show)
+    show.ids['insert_store_cancel'].bind(on_press=popup_window.dismiss)
+    popup_window.open()
 
 # ------------------------------ #
 #         Update Part            #
@@ -530,6 +571,9 @@ class MainLayout(BoxLayout):
 
     def insert_food_button(self):
         show_insert_food_popup()
+
+    def insert_store_button(self):
+        show_insert_store_popup()
 
 # ------- Update -------
     def update_customer_button(self):
