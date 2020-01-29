@@ -5,16 +5,9 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.lang import Builder
 
-from datetime import datetime
-
-
 
 def get_connection():
-    return psycopg2.connect(user="engmrgh",
-                                    password="h3ll9db",
-                                    host="localhost",
-                                    port="5432",
-                                    database="citado")
+    return psycopg2.connect(user="engmrgh", password="h3ll9db", host="localhost", port="5432", database="citado")
 
 # ------------------- #
 #   Ordering Part     #
@@ -46,11 +39,11 @@ def show_raw_material_order_popup():
 
 
 # =================== #
-#   Insertion Part    #
+#   Insert Part    #
 # =================== #
 
 # ------ Insert Customer ------ #
-Builder.load_file('Insertion/insert_customer.kv')
+Builder.load_file('Insert/customer.kv')
 
 
 class InsertCustomerPopUp(BoxLayout):
@@ -90,7 +83,7 @@ def show_insert_customer_popup():
 
 
 # ---- Insert Biker ---- #
-Builder.load_file('Insertion/insert_biker.kv')
+Builder.load_file('Insert/biker.kv')
 
 
 class InsertBikerPopUp(BoxLayout):
@@ -129,7 +122,7 @@ def show_insert_biker_popup():
 
 
 # ---- insert Address ---- #
-Builder.load_file('Insertion/insert_address.kv')
+Builder.load_file('Insert/address.kv')
 
 
 class InsertAddressPopUp(BoxLayout):
@@ -167,7 +160,7 @@ def show_insert_address_popup():
 
 
 # ----------    Insert Food    ----------
-Builder.load_file('Insertion/insert_food.kv')
+Builder.load_file('Insert/food.kv')
 
 
 class InsertFoodPopUp(BoxLayout):
@@ -217,7 +210,7 @@ def show_insert_food_popup():
 
 # ------ update Customer --------
 
-Builder.load_file('update_customer.kv')
+Builder.load_file('update/customer.kv')
 
 
 class UpdateCustomerPopUp(BoxLayout):
@@ -294,7 +287,7 @@ def show_update_customer_popup():
 
 
 # ---------- Update Address -------------
-Builder.load_file('update_address.kv')
+Builder.load_file('update/address.kv')
 
 
 class UpdateAddressPopUp(BoxLayout):
@@ -373,7 +366,7 @@ def show_update_address_popup():
 # ------------------------------ #
 
 # ---------- Delete Customer -------------
-Builder.load_file('delete_customer.kv')
+Builder.load_file('delete/customer.kv')
 
 
 class DeleteCustomerPopUp(BoxLayout):
@@ -446,7 +439,7 @@ def show_delete_customer_popup():
 
 
 # ---------- Delete Address -------------
-Builder.load_file('delete_address.kv')
+Builder.load_file('delete/address.kv')
 
 
 class DeleteAddressPopUp(BoxLayout):
@@ -525,7 +518,7 @@ class MainLayout(BoxLayout):
     def order_raw_material_button(self):
         show_raw_material_order_popup()
 
-# ------- Insertion ------
+# ------- Insert ------
     def insert_customer_button(self):
         show_insert_customer_popup()
 
