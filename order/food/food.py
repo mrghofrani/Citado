@@ -16,6 +16,7 @@ class FoodOrderPopUp(BoxLayout):
         self.customer_list = []
         self.address_list = []
         self.biker_list = []
+        self.customer_set = False
 
     def pick_factor(self):
         postgres_query = """SELECT * FROM factor"""
@@ -49,52 +50,51 @@ class FoodOrderPopUp(BoxLayout):
     def set_customer(self):
         factor_id = self.ids.factor_id_selector.text
         factor_id = int(factor_id)
-        if self.disable_list[factor_id]:  # if the factor is disabled
-            postgres_query = f"""SELECT * FROM factor_customer WHERE factor_id={factor_id}"""
-            customer_list = []
-            self.customer_list = query(postgres_query, "factor_customer")
-            if self.customer_list:
-                for row in self.customer_list:
-                    customer_list.append(str(row[0]))
-                self.ids.customer_selector.text = self.customer_list[0][1]
-            else:
-                self.ids.customer_selector.text = "unregistered user"
-            self.ids.customer_selector.disabled = True
+        postgres_query = f"""SELECT * FROM factor_customer WHERE factor_id={factor_id}"""
+        self.customer_list = query(postgres_query, "factor_customer")
+        if self.customer_list:
+            customer = self.customer_list[0][0]
         else:
-            postgres_query = """SELECT * FROM customer"""
-            customer_list = []
-            self.customer_list = query(postgres_query, "customer")
-            for row in self.customer_list:
-                customer_list.append(row[0])
-            customer_list.append("unregistered user")
-            self.ids.customer_selector.values = customer_list
-            self.ids.customer_selector.disabled = False
-            self.ids.set_customer.disabled = False
+            customer = "unregistered user"
+        self.ids.customer_selector.text = str(customer)
 
     def set_address(self):
+        factor_id = self.ids.factor_id_selector.text
         customer = self.ids.customer_selector.text
-        if customer:
-            postgres_query = f"""SELECT * FROM customer JOIN address WHERE national_code = {customer}"""
-            address_list = []
-            self.address_list = query(postgres_query, "address JOIN customer")
-            for row in self.address_list:
-                address_list.append(row[0])
-            address_list.append("Restaurant")
-            return address_list
-        return ['Choose a customer']
+        if customer != "unregistered user":
+            postgres_query = f"""SELECT * FROM factor_address WHERE factor_id={factor_id}"""
+            self.address_list = query(postgres_query, "factor_address")
+            if self.address_list:
+                address = self.address_list[0][1]
+            else:
+                address = "Restaurant"
+        else:
+            address = "Restaurant"
+        self.ids.address_selector.text = str(address)
 
     def set_biker(self):
-        postgres_query = """SELECT * FROM biker"""
-        biker_list = []
-        self.biker_list = query(postgres_query, "biker")
-        for row in self.biker_list:
-            biker_list.append(row[0])
-        return biker_list
+        factor_id = self.ids.factor_id_selector.text
+        customer = self.ids.customer_selector.text
+        if customer != "unregistered user":
+            postgres_query = f"""SELECT * FROM delivery WHERE factor_id={factor_id}"""
+            self.biker_list = query(postgres_query, "delivery")
+            if self.biker_list:
+                biker = str(self.biker_list[0][0])
+            else:
+                biker = "None"
+        else:
+            biker = "None"
+        self.ids.biker_selector.text = biker
 
     def update_form(self):
-        self.set_customer()
-        # self.set_address()
-        # self.set_biker()
+        factor_id = self.ids.factor_id_selector.text
+        factor_id = int(factor_id)
+        if self.disable_list[factor_id]:
+            self.set_customer()
+            self.set_address()
+            self.set_biker()
+        else:
+            self.populate_customer()
 
     def set_food_customer(self):
         factor_id = self.ids.factor_id_selector.text
@@ -104,6 +104,7 @@ class FoodOrderPopUp(BoxLayout):
         values = (factor_id, customer)
         if customer != "unregistered user":
             insert(postgres_insert_query, values, "factor_customer")
+        self.customer_set = True
         self.disable_list[factor_id] = True
         self.ids.customer_selector.disabled = True
         self.ids.set_customer.disabled = True

@@ -30,8 +30,6 @@ class InsertAddressPopUp(BoxLayout):
         insert(postgres_insert_query, values, "customer_address")
 
 
-
-
 def show_insert_address_popup():
     show = InsertAddressPopUp()
     popup_window = Popup(title="Insert Address", content=show)
