@@ -4,22 +4,30 @@
         Label:
             text: 'Phone number'
         TextInput:
-            id: addressPhoneNumber
+            id: phone_number
             multiline: False
 
     BoxLayout:
         Label:
             text: 'Name'
         TextInput:
-            id: addressName
+            id: name
             multiline: False
 
     BoxLayout:
         Label:
             text: 'Address'
         TextInput:
-            id: addressAddress
+            id: address
             multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Customer'
+        Spinner:
+            id: customer
+            text: 'Customer'
+            values: root.get_customer_list()
 
     BoxLayout:
         Button:
