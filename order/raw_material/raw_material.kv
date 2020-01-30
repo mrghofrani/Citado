@@ -1,0 +1,36 @@
+<RawMaterialOrderPopUp>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            id: store
+            text: 'Store'
+        Spinner:
+            text: 'Home'
+            values: 'Home', 'Work', 'Other', 'Custom'
+
+    BoxLayout:
+        Label:
+            id: material
+            text: 'Material'
+
+        Spinner:
+            text: 'Home'
+            values: 'Home', 'Work', 'Other', 'Custom'
+
+    BoxLayout:
+        Label:
+            id: price
+            text: 'Price'
+
+        Label:
+            id: price_val
+            text: "temporal"
+
+    BoxLayout:
+        Button:
+            id: raw_material_order_submit
+            text: "Submit"
+
+        Button:
+            id: raw_material_order_cancel
+            text: "Cancel"
