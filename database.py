@@ -16,7 +16,8 @@ def insert(postgres_insert_query, values, table):
         connection = get_connection()
         cursor = connection.cursor()
         cursor.execute(postgres_insert_query, values)
-        result = cursor.fetone()[0]
+        if "returning" in postgres_insert_query.lower():
+            result = cursor.fetchone()[0]
         connection.commit()
         count = cursor.rowcount
         print(count, f"Record inserted successfully into {table} table")

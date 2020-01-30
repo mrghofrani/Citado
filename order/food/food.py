@@ -17,32 +17,6 @@ class FoodOrderPopUp(BoxLayout):
         self.address_list = []
         self.biker_list = []
 
-    def pick_customer(self):
-        factor_id = self.ids.factor_id_selector.text
-        try:
-            factor_id = int(factor_id)
-        except:
-            return ['Set customer']
-        if self.disable_list[factor_id]:
-            postgres_query = f"""SELECT * FROM factor_customer WHERE factor_id={factor_id}"""
-            customer_list = []
-            self.customer_list = query(postgres_query, "factor_customer")
-            if self.customer_list:
-                for row in self.customer_list:
-                    customer_list.append(str(row[0]))
-                self.ids.customer_selector.text = self.customer_list[0][1]
-                self.ids.customer_selector.disabled = True
-        else:
-            postgres_query = """SELECT * FROM customer"""
-            customer_list = []
-            self.customer_list = query(postgres_query, "customer")
-            for row in self.customer_list:
-                customer_list.append(row[0])
-            customer_list.append("Unregistered")
-            self.ids.customer_selector.values = customer_list
-            self.ids.customer_selector.disabled = False
-
-
     def pick_factor(self):
         postgres_query = """SELECT * FROM factor"""
         factor_id_list = []
@@ -54,6 +28,15 @@ class FoodOrderPopUp(BoxLayout):
 
         return factor_id_list
 
+    def new(self):
+        today = date.today()
+        postgres_insert_query = """INSERT INTO factor(date)
+                                   VALUES (%s) RETURNING  id"""
+        values = (today,)
+        new_factor_id = insert(postgres_insert_query, values, "factor")
+        self.ids.factor_id_selector.values = self.pick_factor()
+        self.disable_list[new_factor_id] = False
+
     def pick_food(self):
         postgres_query = """SELECT * FROM food WHERE name_start_time < current_date AND current_date < name_end_time
                                                AND  price_start_time < current_date AND current_date < price_end_time"""
@@ -63,7 +46,32 @@ class FoodOrderPopUp(BoxLayout):
             food_list.append(row[0])
         return food_list
 
-    def pick_address(self):
+    def set_customer(self):
+        factor_id = self.ids.factor_id_selector.text
+        factor_id = int(factor_id)
+        if self.disable_list[factor_id]:  # if the factor is disabled
+            postgres_query = f"""SELECT * FROM factor_customer WHERE factor_id={factor_id}"""
+            customer_list = []
+            self.customer_list = query(postgres_query, "factor_customer")
+            if self.customer_list:
+                for row in self.customer_list:
+                    customer_list.append(str(row[0]))
+                self.ids.customer_selector.text = self.customer_list[0][1]
+            else:
+                self.ids.customer_selector.text = "unregistered user"
+            self.ids.customer_selector.disabled = True
+        else:
+            postgres_query = """SELECT * FROM customer"""
+            customer_list = []
+            self.customer_list = query(postgres_query, "customer")
+            for row in self.customer_list:
+                customer_list.append(row[0])
+            customer_list.append("unregistered user")
+            self.ids.customer_selector.values = customer_list
+            self.ids.customer_selector.disabled = False
+            self.ids.set_customer.disabled = False
+
+    def set_address(self):
         customer = self.ids.customer_selector.text
         if customer:
             postgres_query = f"""SELECT * FROM customer JOIN address WHERE national_code = {customer}"""
@@ -75,7 +83,7 @@ class FoodOrderPopUp(BoxLayout):
             return address_list
         return ['Choose a customer']
 
-    def pick_biker(self):
+    def set_biker(self):
         postgres_query = """SELECT * FROM biker"""
         biker_list = []
         self.biker_list = query(postgres_query, "biker")
@@ -83,23 +91,22 @@ class FoodOrderPopUp(BoxLayout):
             biker_list.append(row[0])
         return biker_list
 
-    def new(self):
-        today = date.today()
-        postgres_insert_query = """INSERT INTO factor(date)
-                                   VALUES (%s) RETURNING  id"""
-        values = (today,)
-        new_factor_id = insert(postgres_insert_query, values, "factor")
-        self.ids.factor_id_selector.values = self.pick_factor()
-        self.disable_list[new_factor_id] = False
+    def update_form(self):
+        self.set_customer()
+        # self.set_address()
+        # self.set_biker()
 
-    def set_customer(self):
+    def set_food_customer(self):
         factor_id = self.ids.factor_id_selector.text
+        factor_id = int(factor_id)
         customer = self.ids.customer_selector.text
         postgres_insert_query = """INSERT INTO factor_customer(factor_id, customer_national_code) VALUES (%s, %s)"""
         values = (factor_id, customer)
-        if customer != "Unregistered":
+        if customer != "unregistered user":
             insert(postgres_insert_query, values, "factor_customer")
+        self.disable_list[factor_id] = True
         self.ids.customer_selector.disabled = True
+        self.ids.set_customer.disabled = True
 
     def submit(self):
         factor_id = self.ids.factor_id_selector.text

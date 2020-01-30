@@ -7,7 +7,7 @@
             id: factor_id_selector
             text: 'Choose a factor'
             values: root.pick_factor()
-            on_text: root.pick_customer()
+            on_text: root.update_form()
         Button:
             id: new_factor
             text: 'new'
@@ -18,12 +18,13 @@
             text: 'Customer'
         Spinner:
             id: customer_selector
-            text: 'not set'
+            text: 'Choose a factor'
             disabled: True
         Button:
             id: set_customer
             text: 'set customer'
-            on_release: root.set_customer()
+            on_release: root.set_food_customer()
+            disabled: True
 
     BoxLayout:
         Label:
@@ -38,8 +39,8 @@
             text: 'Address'
         Spinner:
             id: address_selector
-            text: 'Unknown'
-            values: root.pick_address()
+            text: 'Restaurant'
+            disabled: True
 
     BoxLayout:
         Label:
@@ -47,7 +48,7 @@
         Spinner:
             id: biker_selector
             text: 'Choose Someone'
-            values: root.pick_biker()
+            disabled: True
 
     BoxLayout:
         Button:
