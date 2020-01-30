@@ -4,25 +4,268 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.lang import Builder
+from datetime import date
 
 
 def get_connection():
     return psycopg2.connect(user="engmrgh", password="h3ll9db", host="localhost", port="5432", database="citado")
 
-# ------------------- #
-#   Ordering Part     #
-# ------------------- #
+# ----------------------------- #
+#          Order Part           #
+# ----------------------------- #
 
 
-# ---- Food Order ----#
+# ---------- Food Order ---------- #
+Builder.load_file('order/food.kv')
+
+
 class FoodOrderPopUp(BoxLayout):
-    pass
+
+    def __init__(self):
+        super().__init__()
+        self.factor_list = []
+        self.food_list = []
+        self.customer_list = []
+        self.address_list = []
+        self.biker_list = []
+
+    def pick_customer(self):
+        factor_id = self.ids.factor_id_selector.text
+        try:
+            factor_id = int(factor_id)
+        except:
+            return ['Set customer']
+        if self.disable_list[factor_id]:
+            postgres_query = f"""SELECT * FROM factor_customer WHERE factor_id={factor_id}"""
+            customer_list = []
+            connection, cursor = None, None
+            try:
+                connection = get_connection()
+                cursor = connection.cursor()
+                cursor.execute(postgres_query)
+                self.customer_list = cursor.fetchall()
+                if self.customer_list:
+                    for row in self.customer_list:
+                        customer_list.append(str(row[0]))
+                    print(customer_list)
+                    print(self.customer_list)
+                    self.ids.customer_selector.text = self.customer_list[0][1]
+                    self.ids.customer_selector.disabled = True
+
+            except (Exception, psycopg2.Error) as error:
+                if connection:
+                    print("Failed to fetch record from factor_customer table ", error)
+            finally:
+                # closing database connection.
+                if connection:
+                    cursor.close()
+                    connection.close()
+        else:
+            postgres_query = """SELECT * FROM customer"""
+            customer_list = []
+            connection, cursor = None, None
+            try:
+                connection = get_connection()
+                cursor = connection.cursor()
+                cursor.execute(postgres_query)
+                self.customer_list = cursor.fetchall()
+                for row in self.customer_list:
+                    customer_list.append(row[0])
+                customer_list.append("Unknown")
+                self.ids.customer_selector.values = customer_list
+                self.ids.customer_selector.disabled = False
+
+            except (Exception, psycopg2.Error) as error:
+                if connection:
+                    print("Failed to fetch record from customer table ", error)
+            finally:
+                # closing database connection.
+                if connection:
+                    cursor.close()
+                    connection.close()
+
+    def pick_factor(self):
+        postgres_query = """SELECT * FROM factor"""
+        factor_id_list = []
+        connection, cursor = None, None
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(postgres_query)
+            self.factor_list = cursor.fetchall()
+            self.disable_list = dict()
+            for row in self.factor_list:
+                factor_id_list.append(str(row[0]))
+                self.disable_list[row[0]] = True
+
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to fetch record into food order table ", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
+        return factor_id_list
+
+    def pick_food(self):
+        postgres_query = """SELECT * FROM food WHERE name_start_time < current_date AND current_date < name_end_time
+                                            AND  price_start_time < current_date AND current_date < price_end_time"""
+        food_list = []
+        connection, cursor = None, None
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(postgres_query)
+            self.food_list = cursor.fetchall()
+            for row in self.food_list:
+                food_list.append(row[0])
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to fetch record into food order table ", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
+        return food_list
+
+    def pick_address(self):
+        customer = self.ids.customer_selector.text
+        if customer:
+            postgres_query = f"""SELECT * FROM customer JOIN address WHERE national_code = {customer}"""
+            address_list = []
+            connection, cursor = None, None
+            try:
+                connection = get_connection()
+                cursor = connection.cursor()
+                cursor.execute(postgres_query)
+                self.address_list = cursor.fetchall()
+                for row in self.address_list:
+                    address_list.append(row[0])
+                address_list.append("Restaurant")
+            except (Exception, psycopg2.Error) as error:
+                if connection:
+                    print("Failed to fetch record into food order table ", error)
+            finally:
+                # closing database connection.
+                if connection:
+                    cursor.close()
+                    connection.close()
+            return address_list
+        return ['Choose a customer']
+
+    def pick_biker(self):
+        postgres_query = """SELECT * FROM biker"""
+        biker_list = []
+        connection, cursor = None, None
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(postgres_query)
+            self.biker_list = cursor.fetchall()
+            for row in self.biker_list:
+                biker_list.append(row[0])
+
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to fetch record into food order table ", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
+        return biker_list
+
+    def new(self):
+        today = date.today()
+        postgres_insert_query = """INSERT INTO factor(date)
+                                   VALUES (%s) RETURNING  id"""
+        values = (today,)
+        connection, cursor = None, None
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(postgres_insert_query, values)
+            new_factor_id = cursor.fetchone()[0]
+            connection.commit()
+            count = cursor.rowcount
+            print(count, "Record inserted successfully into factor table")
+            print(f"new_factor id {new_factor_id}")
+            self.ids.factor_id_selector.values = self.pick_factor()
+            self.disable_list[new_factor_id] = False
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to insert record into factor table", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
+
+    def set_customer(self):
+        factor_id = self.ids.factor_id_selector.text
+        customer = self.ids.customer_selector.text
+        postgres_insert_query = """INSERT INTO factor_customer(factor_id, customer_national_code) VALUES (%s, %s)"""
+        values = (factor_id, customer)
+        connection, cursor = None, None
+        if customer != "Unknown":
+            try:
+                connection = get_connection()
+                cursor = connection.cursor()
+                cursor.execute(postgres_insert_query, values)
+                connection.commit()
+                count = cursor.rowcount
+                print(count, "Record inserted successfully into factor_customer table")
+
+            except (Exception, psycopg2.Error) as error:
+                if connection:
+                    print("Failed to insert record into factor_customer table", error)
+            finally:
+                # closing database connection.
+                if connection:
+                    cursor.close()
+                    connection.close()
+        self.ids.customer_selector.disabled = True
+
+    def submit(self):
+        factor_id = self.ids.factor_id_selector.text
+        food = self.ids.food_selector.text
+        customer = self.ids.customer_selector.text
+        address = self.ids.address_selector.text
+        biker = self.ids.biker_selector.text
+
+        connection, cursor = None, None
+        postgres_insert_query = """ INSERT INTO food_fact(factor_int, food_name, food_name_start_time, food_price_start_time)
+                                           VALUES (%s, %s, %s, %s) """
+        food_start_time = None
+        for f in self.food_list:
+            if f[0] == food:
+                food_start_time = f[2] # food name start time index
+        values = (factor_id, food, food_start_time, )
+        try:
+            connection = get_connection()
+            cursor = connection.cursor()
+            cursor.execute(postgres_insert_query, values)
+
+            connection.commit()
+            count = cursor.rowcount
+            print(count, "Record inserted successfully into factor table")
+
+        except (Exception, psycopg2.Error) as error:
+            if connection:
+                print("Failed to insert record into factor table", error)
+        finally:
+            # closing database connection.
+            if connection:
+                cursor.close()
+                connection.close()
 
 
 def show_food_order_popup():
     show = FoodOrderPopUp()
     popup_window = Popup(title="Order Food", content=show)
-    show.ids['food_order_cancel'].bind(on_press=popup_window.dismiss)
+    show.ids['cancel'].bind(on_press=popup_window.dismiss)
     popup_window.open()
 
 
@@ -38,9 +281,9 @@ def show_raw_material_order_popup():
     popup_window.open()
 
 
-# =================== #
-#   Insert Part    #
-# =================== #
+# ----------------------------- #
+#          Insert Part          #
+# ----------------------------- #
 
 # ------ Insert Customer ------ #
 Builder.load_file('Insert/customer.kv')
@@ -53,11 +296,12 @@ class InsertCustomerPopUp(BoxLayout):
         last_name = self.ids.customerLastName.text
         mobile_number = self.ids.customerMobileNumber.text
         age = self.ids.customerAge.text
-        connection = get_connection()
         postgres_insert_query = " INSERT INTO customer(national_code, first_name, last_name, mobile_number, age) " \
                                 " VALUES (%s, %s, %s, %s, %s) "
         values = (national_code, first_name, last_name, mobile_number, age)
+        connection, cursor = None, None
         try:
+            connection = get_connection()
             cursor = connection.cursor()
             cursor.execute(postgres_insert_query, values)
 
@@ -93,7 +337,7 @@ class InsertBikerPopUp(BoxLayout):
         last_name = self.ids.bikerLastName.text
         mobile_number = self.ids.bikerMobileNumber.text
         connection = get_connection()
-        postgres_insert_query = " INSERT INTO bike_delivery(national_code, first_name, last_name, mobile_number) " \
+        postgres_insert_query = " INSERT INTO biker(national_code, first_name, last_name, mobile_number) " \
                                 "VALUES (%s, %s, %s, %s) "
         values = (national_code, first_name, last_name, mobile_number)
         try:

@@ -1,0 +1,60 @@
+<FoodOrderPopUp>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'Factor id'
+        Spinner:
+            id: factor_id_selector
+            text: 'Choose a factor'
+            values: root.pick_factor()
+            on_text: root.pick_customer()
+        Button:
+            id: new_factor
+            text: 'new'
+            on_release: root.new()
+
+    BoxLayout:
+        Label:
+            text: 'Customer'
+        Spinner:
+            id: customer_selector
+            text: 'not set'
+            disabled: True
+        Button:
+            id: set_customer
+            text: 'set customer'
+            on_release: root.set_customer()
+
+    BoxLayout:
+        Label:
+            text: 'Food'
+        Spinner:
+            id: food_selector
+            text: 'Choose Food'
+            values: root.pick_food()
+
+    BoxLayout:
+        Label:
+            text: 'Address'
+        Spinner:
+            id: address_selector
+            text: 'Unknown'
+            values: root.pick_address()
+
+    BoxLayout:
+        Label:
+            text: 'Biker'
+        Spinner:
+            id: biker_selector
+            text: 'Choose Someone'
+            values: root.pick_biker()
+
+    BoxLayout:
+        Button:
+            id: submit
+            text: 'Submit'
+            on_release: root.submit()
+
+        Button:
+            id: cancel
+            text: 'Cancel'

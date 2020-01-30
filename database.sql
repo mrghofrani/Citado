@@ -48,9 +48,16 @@ CREATE TABLE factor(
 CREATE TABLE fact_cust_add(
     factor_id int,
     address_phone char(7),
-    customer_national_code char(10),
+    PRIMARY KEY (factor_id),
     FOREIGN KEY (factor_id) REFERENCES factor,
-    FOREIGN KEY (address_phone) REFERENCES address,
+    FOREIGN KEY (address_phone) REFERENCES address
+);
+
+CREATE TABLE factor_customer(
+    factor_id int,
+    customer_national_code char(10),
+    PRIMARY KEY (factor_id),
+    FOREIGN KEY (factor_id) REFERENCES factor,
     FOREIGN KEY (customer_national_code) REFERENCES customer
 );
 
@@ -59,6 +66,7 @@ CREATE TABLE food_fact(
     food_name varchar(128),
     food_name_start_time date,
     food_price_start_time date,
+    PRIMARY KEY (factor_int, food_name, food_name_start_time),
     FOREIGN KEY (factor_int) REFERENCES factor,
     FOREIGN KEY (food_name, food_name_start_time, food_price_start_time) REFERENCES food
 );
@@ -67,6 +75,7 @@ CREATE TABLE delivery(
     factor_id int,
     address_phone char(7),
     bike_delivery_national_code char(10),
+    PRIMARY (factor_id),
     FOREIGN KEY (factor_id) REFERENCES factor,
     FOREIGN KEY (address_phone) REFERENCES address,
     FOREIGN KEY (bike_delivery_national_code) REFERENCES bike_delivery
@@ -92,21 +101,28 @@ CREATE TABLE store_ingredient(
     store_start_time date,
     ingredient_name varchar(32),
     ingredient_start_time date,
+    PRIMARY KEY (store_name, store_start_time, ingredient_name, ingredient_start_time),
     FOREIGN KEY (store_name, store_start_time) REFERENCES store,
     FOREIGN KEY (ingredient_name, ingredient_start_time) REFERENCES  ingredient
 );
 
-CREATE TABLE fact_store(
+CREATE TABLE store_factor(
     factor_id int,
     store_name varchar(128),
     store_start_time date,
-    ingredient_name varchar(32),
-    ingredient_start_time date,
+    PRIMARY KEY (factor_id),
     FOREIGN KEY (factor_id) REFERENCES factor,
-    FOREIGN KEY (store_name, store_start_time) REFERENCES store,
-    FOREIGN KEY (ingredient_name, ingredient_start_time) REFERENCES ingredient
+    FOREIGN KEY (store_name, store_start_time) REFERENCES store
 );
 
+CREATE TABLE factor_ingredient(
+    factor_id int,
+    ingredient_name varchar(32),
+    ingredient_start_time date,
+    PRIMARY KEY (factor_id),
+    FOREIGN KEY (factor_id) REFERENCES factor,
+    FOREIGN KEY (ingredient_name, ingredient_start_time) REFERENCES ingredient
+);
 
 CREATE OR REPLACE FUNCTION isnumeric(text) RETURNS BOOLEAN AS $$
     DECLARE x NUMERIC;
