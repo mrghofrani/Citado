@@ -53,13 +53,13 @@ def update(postgres_update_query, values, table):
             connection.close()
 
 
-def query(postgres_query, table):
+def query(postgres_query, table, values=tuple()):
     connection, cursor = None, None
     result = None
     try:
         connection = get_connection()
         cursor = connection.cursor()
-        cursor.execute(postgres_query)
+        cursor.execute(postgres_query, values)
         result = cursor.fetchall()
         print(f"Record Read successfully from table {table} ")
     except (Exception, psycopg2.Error) as error:

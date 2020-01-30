@@ -21,13 +21,9 @@ class InsertAddressPopUp(BoxLayout):
         address = self.ids.address.text
         customer = self.ids.customer.text
 
-        postgres_insert_query = """INSERT INTO address(phone, name, address) VALUES (%s,%s,%s)"""
-        values = (phone_number, name, address)
+        postgres_insert_query = """INSERT INTO address(phone, name, address, customer) VALUES (%s,%s,%s,%s)"""
+        values = (phone_number, name, address, customer)
         insert(postgres_insert_query, values, "address") # adding to database
-
-        postgres_insert_query = """INSERT INTO customer_address(customer_national_code, address_phone) VALUES (%s,%s)"""
-        values = (customer, phone_number)
-        insert(postgres_insert_query, values, "customer_address")
 
 
 def show_insert_address_popup():

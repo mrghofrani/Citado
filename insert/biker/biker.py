@@ -13,7 +13,7 @@ class InsertBikerPopUp(BoxLayout):
         last_name = self.ids.bikerLastName.text
         mobile_number = self.ids.bikerMobileNumber.text
 
-        postgres_insert_query = """ INSERT INTO biker(national_code, first_name, last_name, mobile_number) 
+        postgres_insert_query = """ INSERT INTO bike_delivery(national_code, first_name, last_name, mobile_number) 
                                     VALUES (%s, %s, %s, %s) """
         values = (national_code, first_name, last_name, mobile_number)
         insert(postgres_insert_query, values, "biker")

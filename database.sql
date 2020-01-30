@@ -1,10 +1,3 @@
-CREATE TABLE address(
-    phone char(7),
-    name varchar(128) not null,
-    address varchar(512) not null,
-    PRIMARY KEY(phone)
-);
-
 CREATE TABLE customer(
     national_code char(10),
     first_name varchar(32) not null,
@@ -14,11 +7,13 @@ CREATE TABLE customer(
     PRIMARY KEY (national_code)
 );
 
-CREATE TABLE customer_address(
-    customer_national_code char(10),
-    address_phone char(7),
-    FOREIGN KEY (customer_national_code) REFERENCES customer,
-    FOREIGN KEY (address_phone) REFERENCES address
+CREATE TABLE address(
+    phone char(7),
+    name varchar(128) not null,
+    address varchar(512) not null,
+    customer char(10) not null,
+    PRIMARY KEY(phone),
+    FOREIGN KEY (customer) REFERENCES customer
 );
 
 CREATE TABLE bike_delivery(
@@ -45,20 +40,20 @@ CREATE TABLE factor(
     PRIMARY KEY (id)
 );
 
-CREATE TABLE fact_cust_add(
-    factor_id int,
-    address_phone char(7),
-    PRIMARY KEY (factor_id),
-    FOREIGN KEY (factor_id) REFERENCES factor,
-    FOREIGN KEY (address_phone) REFERENCES address
-);
-
 CREATE TABLE factor_customer(
     factor_id int,
     customer_national_code char(10),
     PRIMARY KEY (factor_id),
     FOREIGN KEY (factor_id) REFERENCES factor,
     FOREIGN KEY (customer_national_code) REFERENCES customer
+);
+
+CREATE TABLE factor_address(
+    factor_id int,
+    address_phone char(7),
+    PRIMARY KEY (factor_id),
+    FOREIGN KEY (factor_id) REFERENCES factor,
+    FOREIGN KEY (address_phone) REFERENCES address
 );
 
 CREATE TABLE food_fact(
@@ -75,7 +70,7 @@ CREATE TABLE delivery(
     factor_id int,
     address_phone char(7),
     bike_delivery_national_code char(10),
-    PRIMARY (factor_id),
+    PRIMARY KEY(factor_id),
     FOREIGN KEY (factor_id) REFERENCES factor,
     FOREIGN KEY (address_phone) REFERENCES address,
     FOREIGN KEY (bike_delivery_national_code) REFERENCES bike_delivery
