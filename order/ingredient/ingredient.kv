@@ -1,0 +1,40 @@
+<IngredientOrderPopUp>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'factor'
+        Spinner:
+            id: factor_selector
+            text: 'Choose a factor'
+            values: root.pick_factor()
+            on_text: root.update_form()
+        Button:
+            text: "new"
+            on_press: root.new()
+
+    BoxLayout:
+        Label:
+            text: 'Store'
+        Spinner:
+            id: store_selector
+            on_text: root.set_store()
+            disabled: True
+        Button:
+            text: 'change'
+            on_press: root.enable_store_selector()
+
+    BoxLayout:
+        Label:
+            text: 'ingredient'
+        Spinner:
+            id: ingredient_selector
+            on_text: root.add()
+            disabled: True
+        Button:
+            text: 'add'
+            on_press: root.enable_add()
+
+    BoxLayout:
+        Button:
+            id: exit
+            text: "Exit"

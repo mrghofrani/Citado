@@ -35,9 +35,8 @@
             text: 'View Reports'
 
         Button:
-            id: order_raw_material
-            text: 'Order Raw Material'
-            on_release: root.order_raw_material_button()
+            text: 'Order Ingredient'
+            on_release: root.order_ingredient_button()
 
         GridLayout:
             rows: 3
@@ -71,8 +70,8 @@
                 on_release: root.insert_food_button()
 
             Button:
-                id: insert_to_sth
-                text: 'Add sth'
+                text: 'Add ingredient'
+                on_release: root.insert_ingredient_button()
 
         GridLayout:
             rows: 2

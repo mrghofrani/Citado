@@ -1,0 +1,48 @@
+<InsertIngredientPopUp>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'Name'
+        TextInput:
+            id: name
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Price'
+        TextInput:
+            id: price
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Price start time'
+        TextInput:
+            id: price_start_time
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Price end time'
+        TextInput:
+            id: price_end_time
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'store'
+        Spinner:
+            id: store_selector
+            values: root.store_lister()
+            on_text: root.enable_submit()
+
+    BoxLayout:
+        Button:
+            text: "Submit"
+            id: submit
+            on_release: root.submit()
+            disabled: True
+
+        Button:
+            id: cancel
+            text: "Cancel"

@@ -16,7 +16,7 @@ CREATE TABLE address(
     FOREIGN KEY (customer) REFERENCES customer
 );
 
-CREATE TABLE bike_delivery(
+CREATE TABLE bike(
     national_code char(10),
     first_name varchar(32) not null,
     last_name varchar(32) not null,
@@ -34,9 +34,9 @@ CREATE TABLE food (
     PRIMARY KEY(name, name_start_time, price_start_time)
 );
 
-CREATE TABLE factor(
+CREATE TABLE factor_of_food(
     id serial,
-    date date,
+    date date not null,
     PRIMARY KEY (id)
 );
 
@@ -44,7 +44,7 @@ CREATE TABLE factor_customer(
     factor_id int,
     customer_national_code char(10),
     PRIMARY KEY (factor_id),
-    FOREIGN KEY (factor_id) REFERENCES factor,
+    FOREIGN KEY (factor_id) REFERENCES factor_of_food,
     FOREIGN KEY (customer_national_code) REFERENCES customer
 );
 
@@ -52,17 +52,18 @@ CREATE TABLE factor_address(
     factor_id int,
     address_phone char(7),
     PRIMARY KEY (factor_id),
-    FOREIGN KEY (factor_id) REFERENCES factor,
+    FOREIGN KEY (factor_id) REFERENCES factor_of_food,
     FOREIGN KEY (address_phone) REFERENCES address
 );
 
-CREATE TABLE food_fact(
+CREATE TABLE food_factor(
     factor_int int,
     food_name varchar(128),
     food_name_start_time date,
     food_price_start_time date,
+    quantity int not null,
     PRIMARY KEY (factor_int, food_name, food_name_start_time),
-    FOREIGN KEY (factor_int) REFERENCES factor,
+    FOREIGN KEY (factor_int) REFERENCES factor_of_food,
     FOREIGN KEY (food_name, food_name_start_time, food_price_start_time) REFERENCES food
 );
 
@@ -71,7 +72,7 @@ CREATE TABLE delivery(
     address_phone char(7),
     bike_delivery_national_code char(10),
     PRIMARY KEY(factor_id),
-    FOREIGN KEY (factor_id) REFERENCES factor,
+    FOREIGN KEY (factor_id) REFERENCES factor_of_food,
     FOREIGN KEY (address_phone) REFERENCES address,
     FOREIGN KEY (bike_delivery_national_code) REFERENCES bike_delivery
 );
@@ -91,6 +92,12 @@ CREATE TABLE ingredient(
     PRIMARY KEY (name, start_time)
 );
 
+CREATE TABLE factor_of_ingredient(
+    id serial,
+    date date not null,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE store_ingredient(
     store_name varchar(128),
     store_start_time date,
@@ -106,7 +113,7 @@ CREATE TABLE store_factor(
     store_name varchar(128),
     store_start_time date,
     PRIMARY KEY (factor_id),
-    FOREIGN KEY (factor_id) REFERENCES factor,
+    FOREIGN KEY (factor_id) REFERENCES factor_of_ingredient,
     FOREIGN KEY (store_name, store_start_time) REFERENCES store
 );
 
@@ -114,8 +121,8 @@ CREATE TABLE factor_ingredient(
     factor_id int,
     ingredient_name varchar(32),
     ingredient_start_time date,
-    PRIMARY KEY (factor_id),
-    FOREIGN KEY (factor_id) REFERENCES factor,
+    PRIMARY KEY (factor_id, ingredient_name, ingredient_start_time),
+    FOREIGN KEY (factor_id) REFERENCES factor_of_ingredient,
     FOREIGN KEY (ingredient_name, ingredient_start_time) REFERENCES ingredient
 );
 
