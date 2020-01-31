@@ -41,8 +41,10 @@
 
     BoxLayout:
         Button:
+            id: submit
             text: "Submit"
             on_release: root.submit()
+            disabled: True
 
         Button:
             id: cancel

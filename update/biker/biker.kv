@@ -1,38 +1,41 @@
-<InsertBikerPopUp>:
+<UpdateBikerPopUp>:
     orientation: 'vertical'
     BoxLayout:
-        id: nationalCode
         Label:
             text: 'National Code'
-        TextInput:
-            id: bikerNationalCodeInput
-            multiline: False
+        Spinner:
+            id: biker_selector
+            text: 'Choose A Biker'
+            values: root.pick_values()
+            on_text: root.update_form()
 
     BoxLayout:
         Label:
             text: 'First Name'
         TextInput:
-            id: bikerFirstName
+            id: first_name
             multiline: False
 
     BoxLayout:
         Label:
             text: 'Last Name'
         TextInput:
-            id: bikerLastName
+            id: last_name
             multiline: False
 
     BoxLayout:
         Label:
             text: 'Mobile Number'
         TextInput:
-            id: bikerMobileNumber
+            id: mobile_number
             multiline: False
 
     BoxLayout:
         Button:
+            id: submit
             text: "Submit"
             on_release: root.submit()
+            disabled: True
 
         Button:
             id: cancel

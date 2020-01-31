@@ -8,10 +8,6 @@ Builder.load_file('update/address/address.kv')
 
 class UpdateAddressPopUp(BoxLayout):
 
-    def __int__(self):
-        super(BoxLayout, self).__init__()
-        self.address_list = []
-
     def pick_values(self):
         postgres_query = "SELECT * FROM address"
         self.address_list = query(postgres_query, "address")

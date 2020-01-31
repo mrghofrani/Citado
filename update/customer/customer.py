@@ -8,10 +8,6 @@ Builder.load_file('update/customer/customer.kv')
 
 class UpdateCustomerPopUp(BoxLayout):
 
-    def __int__(self):
-        super(BoxLayout, self).__init__()
-        self.customer_list = []
-
     def pick_values(self):
         postgres_query = """SELECT * FROM customer"""
         self.customer_list = query(postgres_query, "customer")
@@ -30,6 +26,7 @@ class UpdateCustomerPopUp(BoxLayout):
         self.ids.customerLastName.text = row[2]  # Last Name of Customer
         self.ids.customerMobileNumber.text = row[3]  # Mobile number of Customer
         self.ids.customerAge.text = str(row[4])  # Age of Customer
+        self.ids.submit.disabled = False
 
     def submit(self):
         national_code = self.ids.customer_selector.text
@@ -48,5 +45,5 @@ class UpdateCustomerPopUp(BoxLayout):
 def show_update_customer_popup():
     show = UpdateCustomerPopUp()
     popup_window = Popup(title="Update Customer", content=show)
-    show.cancel.bind(on_press=popup_window.dismiss)
+    show.ids.cancel.bind(on_press=popup_window.dismiss)
     popup_window.open()
