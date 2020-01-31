@@ -20,6 +20,9 @@ class DeleteCustomerPopUp(BoxLayout):
             customer_id_list.append(row[0])
         return customer_id_list
 
+    def update_customer_selector(self):
+        self.ids.customer_selector.values = self.pick_values()
+
     def update_form(self):
         selected_id = self.ids.customer_selector.text
         row = tuple()
@@ -37,6 +40,7 @@ class DeleteCustomerPopUp(BoxLayout):
                               WHERE national_code = %s"""
         values = (national_code, )
         delete(postgres_delete_query, values, "customer")
+        self.update_customer_selector()
 
 
 def show_delete_customer_popup():
