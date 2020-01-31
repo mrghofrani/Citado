@@ -1,0 +1,41 @@
+<DeleteBikerPopUp>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'National Code'
+        Spinner:
+            id: biker_selector
+            text: 'Choose A Biker'
+            values: root.pick_values()
+            on_text: root.update_form()
+
+    BoxLayout:
+        Label:
+            text: 'First name'
+        Label:
+            id: firstName
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Last name'
+        Label:
+            id: lastName
+            multiline: False
+
+    BoxLayout:
+        Label:
+            text: 'Mobile Number'
+        Label:
+            id: mobileNumber
+            multiline: False
+
+    BoxLayout:
+        Button:
+            text: "Delete"
+            on_release: root.delete()
+            disabled: True
+
+        Button:
+            id: cancel
+            text: "Cancel"

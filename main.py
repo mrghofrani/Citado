@@ -13,6 +13,7 @@ from update.address.address import show_update_address_popup
 
 from delete.address.address import show_delete_address_popup
 from delete.customer.customer import show_delete_customer_popup
+from delete.biker.biker import show_delete_biker_popup
 
 from order.food.food import show_food_order_popup
 from order.ingredient.ingredient import show_ingredient_order_popup
@@ -57,6 +58,9 @@ class MainLayout(BoxLayout):
 
     def delete_address_button(self):
         show_delete_address_popup()
+
+    def delete_biker_button(self):
+        show_delete_biker_popup()
 
 
 class MainPage(App):
