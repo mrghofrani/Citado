@@ -121,6 +121,7 @@ CREATE TABLE factor_ingredient(
     factor_id int,
     ingredient_name varchar(32),
     ingredient_start_time date,
+    quantity int not null,
     PRIMARY KEY (factor_id, ingredient_name, ingredient_start_time),
     FOREIGN KEY (factor_id) REFERENCES factor_of_ingredient,
     FOREIGN KEY (ingredient_name, ingredient_start_time) REFERENCES ingredient
