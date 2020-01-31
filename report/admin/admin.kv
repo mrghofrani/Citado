@@ -1,0 +1,46 @@
+<AdminReport>:
+    GridLayout:
+        rows: 1
+        cols: 2
+        BoxLayout:
+            orientation: 'vertical'
+            BoxLayout:
+                Label:
+                    text: 'date'
+                Spinner:
+                    id: date_selector
+                    values: root.pick_dates()
+
+            BoxLayout:
+                Label:
+                    text: 'mode'
+                ToggleButton:
+                    id: total
+                    text: 'total'
+                    group: 'group'
+                    on_press: root.update()
+                ToggleButton:
+                    id: sold
+                    text: 'sold'
+                    group: 'group'
+                    on_press: root.update()
+                ToggleButton:
+                    id: buy
+                    text: 'buy'
+                    group: 'group'
+                    on_press: root.update()
+
+            BoxLayout:
+                Label:
+                    text: 'Value'
+                Label:
+                    id: value
+                    text: '0'
+
+            BoxLayout:
+                Button:
+                    id: exit
+                    text: 'Exit'
+
+        TextInput:
+            id: result

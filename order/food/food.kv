@@ -19,10 +19,12 @@
         Spinner:
             id: customer_selector
             text: 'Choose a factor'
+            on_text: root.set_factor_customer()
+            disabled: True
         Button:
             id: set_customer
             text: 'set customer'
-            on_release: root.set_factor_customer()
+            on_release: root.enable_customer_selector()
 
     BoxLayout:
         Label:
@@ -38,6 +40,7 @@
         Button:
             id: delete_food
             text: 'delete'
+            disabled: True
 
     BoxLayout:
         Label:
@@ -45,10 +48,14 @@
         Spinner:
             id: address_selector
             text: 'Restaurant'
+            on_text: root.enable_proper()
+            disabled: True
         Button:
             id: set_address
             text: "set"
             on_release: root.set_factor_address()
+            disabled: True
+
 
     BoxLayout:
         Label:
@@ -56,10 +63,13 @@
         Spinner:
             id: biker_selector
             text: 'Choose Someone'
+            disabled: True
         Button:
             id: set_biker
             text: "set"
             on_release: root.set_factor_biker()
+            disabled: True
+
 
     BoxLayout:
         Button:

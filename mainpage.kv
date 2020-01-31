@@ -30,9 +30,13 @@
             text: 'Order Food'
             on_release: root.order_food_button()
 
-        Button:
-            id: view_reports
-            text: 'View Reports'
+        BoxLayout:
+            Button:
+                text: 'View User Reports'
+
+            Button:
+                text: 'View Admin Reports'
+                on_release: root.admin_report_button()
 
         Button:
             text: 'Order Ingredient'

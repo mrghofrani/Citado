@@ -19,7 +19,7 @@ class FoodOrderPopUp(BoxLayout):
         self.customer = "unregistered user"
 
     def pick_factor(self):
-        postgres_query = """SELECT * FROM factor"""
+        postgres_query = """SELECT * FROM factor_of_food"""
         factor_id_list = []
         self.factor_list = query(postgres_query, "factor")
         for row in self.factor_list:
@@ -28,7 +28,7 @@ class FoodOrderPopUp(BoxLayout):
 
     def new(self):
         today = date.today()
-        postgres_insert_query = """INSERT INTO factor(date)
+        postgres_insert_query = """INSERT INTO factor_of_food(date)
                                    VALUES (%s) RETURNING  id"""
         values = (today,)
         new_factor_id = insert(postgres_insert_query, values, "factor")
@@ -55,16 +55,24 @@ class FoodOrderPopUp(BoxLayout):
 
         postgres_query = f"""SELECT * FROM customer"""
         self.customer_list = query(postgres_query, "customer")
-        self.customer_list.append("unregistered user")
-        customer_list = []
+        # self.customer_list.append("unregistered user")
+        customer_list = ["unregistered user"]
         for row in self.customer_list:
             customer_list.append(str(row[0]))
         self.ids.customer_selector.values = customer_list
 
+    def enable_customer_selector(self):
+        self.ids.customer_selector.disabled = False
+
     def set_factor_customer(self):
         factor_id = self.ids.factor_id_selector.text
         customer = self.ids.customer_selector.text
-        if customer != "unregistered user":
+        if customer == "unregistered user":
+            postgres_insert_query = """DELETE FROM factor_customer
+                                       WHERE factor_customer.factor_id = %s"""
+            values = (factor_id)
+            delete(postgres_insert_query, values, "factor_customer")
+        else:
             postgres_insert_query = """INSERT INTO factor_customer(factor_id, customer_national_code) VALUES (%s, %s)
                                        ON CONFLICT (factor_id)
                                        DO UPDATE 
@@ -72,12 +80,27 @@ class FoodOrderPopUp(BoxLayout):
                                        WHERE factor_customer.factor_id = %s"""
             values = (factor_id, customer, customer, factor_id)
             insert(postgres_insert_query, values, "factor_customer")
+        self.address_lister()
+        self.ids.customer_selector.disabled = True
+
+    def enable_proper(self):
+        address = self.ids.address_selector.text
+        if address != "Restaurant":
+            self.ids.biker_selector.disabled = False
+            self.ids.set_biker.disabled = False
+        else:
+            self.ids.biker_selector.disabled = True
+            self.ids.set_biker.disabled = True
 
     def address_lister(self):
         factor_id = self.ids.factor_id_selector.text
-        if self.customer != "unregistered user":
-            postgres_query = f"""SELECT * FROM factor_address WHERE factor_id={factor_id}"""
-            self.address_list = query(postgres_query, "factor_address")
+        customer = self.ids.customer_selector.text
+        print(customer)
+        if customer != "unregistered user":
+            self.ids.address_selector.disabled = False
+            postgres_query = f"""SELECT * FROM factor_address WHERE factor_id=%s"""
+            values = (factor_id,)
+            self.address_list = query(postgres_query, "factor_address", values)
             if self.address_list:
                 address = self.address_list[0][1]
             else:
@@ -88,8 +111,8 @@ class FoodOrderPopUp(BoxLayout):
         self.ids.address_selector.text = str(address)
 
         address_list = ["Restaurant"]
-        postgres_query = f"""SELECT * FROM address WHERE customer=%s"""
-        values = (self.customer,)
+        postgres_query = f"""SELECT * FROM address WHERE customer = %s"""
+        values = (customer,)
         address_query = query(postgres_query, "address", values)
         if address_query:
             for row in address_query:
@@ -100,7 +123,7 @@ class FoodOrderPopUp(BoxLayout):
         factor_id = self.ids.factor_id_selector.text
         address = self.ids.address_selector.text
         customer = self.ids.customer_selector.text
-        if self.customer != "unregistered user" and customer != "unregistered user":
+        if customer != "unregistered user":
             if address == "Restaurant":
                 postgres_delete_query = """DELETE FROM factor_address
                                            WHERE factor_id = %s"""
@@ -112,6 +135,8 @@ class FoodOrderPopUp(BoxLayout):
                                             WHERE  factor_id= %s"""
                 values = (factor_id,)
                 delete(postgres_delete_query, values, "delivery")
+                self.ids.biker_selector.disabled = True
+                self.ids.set_biker.disabled = True
             else:
                 postgres_insert_query = """INSERT INTO factor_address(factor_id, address_phone) 
                                             VALUES (%s, %s) ON CONFLICT (factor_id) 
@@ -120,6 +145,8 @@ class FoodOrderPopUp(BoxLayout):
                                             WHERE factor_address.factor_id = %s"""
                 values = (factor_id, address, address, factor_id)
                 insert(postgres_insert_query, values, "factor_customer")
+                self.ids.biker_selector.disabled = False
+                self.ids.set_biker.disabled = False
             self.address = address
         else:
             self.address = "Restaurant"
@@ -137,7 +164,7 @@ class FoodOrderPopUp(BoxLayout):
             biker = "None"
         self.ids.biker_selector.text = biker
 
-        postgres_query = """SELECT * FROM bike_delivery"""
+        postgres_query = """SELECT * FROM bike"""
         self.biker_list = query(postgres_query, "biker")
         biker_list = []
         if self.biker_list:
@@ -161,16 +188,19 @@ class FoodOrderPopUp(BoxLayout):
             insert(postgres_insert_query, values, "delivery")
 
     def update_form(self):
+        self.ids.set_address.disabled = False
         self.customer_lister()
-        self.address_lister()
-        self.biker_lister()
 
     def add(self):
         factor_id = self.ids.factor_id_selector.text
         food = self.ids.food_selector.text
 
-        postgres_insert_query = """INSERT INTO food_fact(factor_int, food_name, food_name_start_time, food_price_start_time)
-                                    VALUES (%s, %s, %s, %s) """
+        postgres_insert_query = """INSERT INTO food_factor(factor_int, food_name, food_name_start_time, food_price_start_time, quantity)
+                                    VALUES (%s, %s, %s, %s, 1) 
+                                    ON CONFLICT (factor_int, food_name, food_name_start_time)
+                                    DO UPDATE 
+                                    SET quantity = food_factor.quantity + 1
+                                    WHERE excluded.factor_int = %s"""
         food_name_start_time = None
         food_price_start_time = None
         for f in self.food_list:
@@ -178,7 +208,7 @@ class FoodOrderPopUp(BoxLayout):
                 food_name_start_time = f[2]  # food name start time index
                 food_price_start_time = f[4]
                 break
-        values = (factor_id, food, food_name_start_time, food_price_start_time)
+        values = (factor_id, food, food_name_start_time, food_price_start_time, factor_id)
         insert(postgres_insert_query, values, "food_fact")
 
 

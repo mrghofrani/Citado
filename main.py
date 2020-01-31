@@ -21,6 +21,8 @@ from delete.food.food import show_delete_food_popup
 from order.food.food import show_food_order_popup
 from order.ingredient.ingredient import show_ingredient_order_popup
 
+from report.admin.admin import show_admin_report_popup
+
 
 class MainLayout(BoxLayout):
     def order_food_button(self):
@@ -73,6 +75,11 @@ class MainLayout(BoxLayout):
 
     def delete_food_button(self):
         show_delete_food_popup()
+
+# ---------- Report ----------
+    def admin_report_button(self):
+        show_admin_report_popup()
+        
 
 class MainPage(App):
     def build(self):

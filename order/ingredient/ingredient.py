@@ -86,9 +86,6 @@ class IngredientOrderPopUp(BoxLayout):
                 store_text = str(val[1])
         self.ids.store_selector.text = store_text
 
-    def enable_add(self):
-        self.ids.ingredient_selector.disabled = False
-
     def add(self):
         factor_id = self.ids.factor_selector.text
         ingredient = self.ids.ingredient_selector.text
@@ -96,16 +93,14 @@ class IngredientOrderPopUp(BoxLayout):
         for row in self.ingredient_list:
             if row[2] == ingredient:
                 ingredient_start_time = row[3]
-        postgres_insert_query = """INSERT INTO factor_ingredient(factor_id, ingredient_name, ingredient_start_time)
-                                           VALUES (%s, %s, %s) 
+        postgres_insert_query = """INSERT INTO factor_ingredient(factor_id, ingredient_name, ingredient_start_time,quantity)
+                                           VALUES (%s, %s, %s, 1) 
                                            ON CONFLICT (factor_id, ingredient_name, ingredient_start_time)
                                            DO UPDATE 
-                                           SET ingredient_name = %s,
-                                               ingredient_start_time = %s
+                                           SET quantity = factor_ingredient.quantity + 1
                                            WHERE excluded.factor_id = %s"""
-        values = (factor_id, ingredient, ingredient_start_time, ingredient, ingredient_start_time, factor_id)
+        values = (factor_id, ingredient, ingredient_start_time, factor_id)
         insert(postgres_insert_query, values, "factor_ingredient")
-        self.ids.ingredient_selector.disabled = True
 
     def update_form(self):
         self.ids.store_selector.disabled = True
