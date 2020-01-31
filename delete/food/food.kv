@@ -1,0 +1,56 @@
+<DeleteFoodPopup>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'name'
+        Spinner:
+            id: food_selector
+            text: 'Choose A Food'
+            values: root.pick_values()
+            on_text: root.update_form()
+
+    BoxLayout:
+        Label:
+            text: 'name start time'
+        Label:
+            id: name_start_time
+            text: ''
+
+    BoxLayout:
+        Label:
+            text: 'name end time'
+        Label:
+            id: name_end_time
+            text: ''
+
+    BoxLayout:
+        Label:
+            text: 'price'
+        Label:
+            id: price
+            text: ''
+
+    BoxLayout:
+        Label:
+            text: 'price start time'
+        Label:
+            id: price_start_time
+            text: ''
+
+    BoxLayout:
+        Label:
+            text: 'price end time'
+        Label:
+            id: price_end_time
+            text: ''
+
+    BoxLayout:
+        Button:
+            id: delete
+            text: "delete"
+            on_release: root.delete()
+            disabled: True
+
+        Button:
+            id: cancel
+            text: "Cancel"
