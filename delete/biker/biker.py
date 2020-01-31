@@ -8,6 +8,10 @@ Builder.load_file('delete/biker/biker.kv')
 
 class DeleteBikerPopUp(BoxLayout):
 
+    def update_biker_selector(self):
+        self.ids.biker_selector.values = self.pick_values()
+
+
     def pick_values(self):
         postgres_query = "SELECT * FROM bike"
         self.biker_list = query(postgres_query, "bike")
@@ -28,18 +32,16 @@ class DeleteBikerPopUp(BoxLayout):
             self.ids.mobile_number.text = selected_row[3]
             self.ids.delete.disabled = False
 
-        print("yes")
-
     def delete(self):
         national_code = self.ids.biker_selector.text
         postgres_delete_query = """DELETE FROM bike
                                    WHERE national_code = %s"""
         values = (national_code, )
         delete(postgres_delete_query, values, "bike")
+        self.update_biker_selector()
 
 
 def show_delete_biker_popup():
-    # print("yes")
     show = DeleteBikerPopUp()
     popup_window = Popup(title="Delete Biker", content=show)
     show.ids.cancel.bind(on_press=popup_window.dismiss)

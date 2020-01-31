@@ -13,25 +13,26 @@
         Label:
             text: 'First name'
         Label:
-            id: firstName
+            id: first_name
             multiline: False
 
     BoxLayout:
         Label:
             text: 'Last name'
         Label:
-            id: lastName
+            id: last_name
             multiline: False
 
     BoxLayout:
         Label:
             text: 'Mobile Number'
         Label:
-            id: mobileNumber
+            id: mobile_number
             multiline: False
 
     BoxLayout:
         Button:
+            id: delete
             text: "Delete"
             on_release: root.delete()
             disabled: True

@@ -74,7 +74,7 @@ CREATE TABLE delivery(
     PRIMARY KEY(factor_id),
     FOREIGN KEY (factor_id) REFERENCES factor_of_food,
     FOREIGN KEY (address_phone) REFERENCES address,
-    FOREIGN KEY (bike_delivery_national_code) REFERENCES bike_delivery
+    FOREIGN KEY (bike_delivery_national_code) REFERENCES bike
 );
 
 CREATE TABLE store(
@@ -163,5 +163,5 @@ CREATE OR REPLACE FUNCTION check_mobile() RETURNS TRIGGER AS $$
 CREATE TRIGGER validate_customer_mobile_number BEFORE INSERT ON customer
     FOR EACH ROW EXECUTE PROCEDURE check_mobile();
 
-CREATE TRIGGER validate_bike_delivery_mobile_number BEFORE INSERT ON bike_delivery
+CREATE TRIGGER validate_bike_delivery_mobile_number BEFORE INSERT ON bike
     FOR EACH ROW EXECUTE PROCEDURE check_mobile();
