@@ -25,18 +25,30 @@ class UpdateAddressPopUp(BoxLayout):
                     row = v
             self.ids.addressName.text = row[1]
             self.ids.addressAddress.text = row[2]
+            self.ids.addressCustomer.text = row[3]
+
+    def pick_customer(self):
+        postgres_query = """SELECT * FROM customer"""
+        self.customer_list = query(postgres_query, "customer")
+        customer_list = []
+        if self.customer_list:
+            for row in self.customer_list:
+                customer_list.append(row[0])
+        return customer_list
 
     def submit(self):
         phone_number = self.ids.address_selector.text
         name = self.ids.addressName.text
         address = self.ids.addressAddress.text
+        customer = self.ids.addressCustomer.text
 
         postgres_update_query = """UPDATE address
-                              SET name = %s, address = %s
+                              SET name = %s, address = %s, customer = %s
                               WHERE phone = %s"""
-        values = (name, address, phone_number)
+        values = (name, address, customer, phone_number)
 
         update(postgres_update_query, values, "address")
+        self.pick_values()
 
 
 def show_update_address_popup():

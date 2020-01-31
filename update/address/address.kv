@@ -24,6 +24,13 @@
             multiline: False
 
     BoxLayout:
+        Label:
+            text: 'Customer'
+        Spinner:
+            id: addressCustomer
+            values: root.pick_customer()
+
+    BoxLayout:
         Button:
             text: "Submit"
             on_release: root.submit()
