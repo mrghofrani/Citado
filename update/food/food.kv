@@ -1,0 +1,51 @@
+<UpdateFoodPopup>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'name'
+        Spinner:
+            id: food_selector
+            text: 'Choose A Food'
+            values: root.pick_values()
+            on_text: root.update_form()
+
+    BoxLayout:
+        Label:
+            text: 'name start time'
+        Label:
+            id: name_start_time
+
+    BoxLayout:
+        Label:
+            text: 'name end time'
+        TextInput:
+            id: name_end_time
+
+    BoxLayout:
+        Label:
+            text: 'price'
+        TextInput:
+            id: price
+
+    BoxLayout:
+        Label:
+            text: 'price start time'
+        Label:
+            id: price_start_time
+
+    BoxLayout:
+        Label:
+            text: 'price end time'
+        TextInput:
+            id: price_end_time
+
+    BoxLayout:
+        Button:
+            id: update_btn
+            text: "update"
+            on_release: root.update_method()
+            disabled: True
+
+        Button:
+            id: cancel
+            text: "Cancel"

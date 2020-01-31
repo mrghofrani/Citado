@@ -11,6 +11,7 @@ from insert.ingredient.ingredient import show_insert_ingredient_popup
 from update.customer.customer import show_update_customer_popup
 from update.address.address import show_update_address_popup
 from update.biker.biker import show_update_biker_popup
+from update.food.food import show_update_food_popup
 
 from delete.address.address import show_delete_address_popup
 from delete.customer.customer import show_delete_customer_popup
@@ -56,6 +57,9 @@ class MainLayout(BoxLayout):
 
     def update_biker_button(self):
         show_update_biker_popup()
+
+    def update_food_button(self):
+        show_update_food_popup()
 
 # -------- Delete -------
     def delete_customer_button(self):
