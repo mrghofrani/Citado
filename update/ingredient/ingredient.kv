@@ -1,0 +1,27 @@
+<UpdateIngredientPopup>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'ingredient'
+        Spinner:
+            id: ingredient_selector
+            text: 'Choose An Ingredient'
+            values: root.pick_values()
+            on_text: root.update_form()
+
+    BoxLayout:
+        Label:
+            text: 'price'
+        TextInput:
+            id: price
+
+    BoxLayout:
+        Button:
+            id: update_btn
+            text: "update"
+            on_release: root.update()
+            disabled: True
+
+        Button:
+            id: cancel
+            text: "Cancel"
