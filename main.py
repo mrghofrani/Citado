@@ -22,6 +22,7 @@ from order.food.food import show_food_order_popup
 from order.ingredient.ingredient import show_ingredient_order_popup
 
 from report.admin.admin import show_admin_report_popup
+from report.user.user import show_user_report_popup
 
 
 class MainLayout(BoxLayout):
@@ -79,6 +80,9 @@ class MainLayout(BoxLayout):
 # ---------- Report ----------
     def admin_report_button(self):
         show_admin_report_popup()
+
+    def user_report_button(self):
+        show_user_report_popup()
         
 
 class MainPage(App):

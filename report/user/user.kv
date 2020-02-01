@@ -1,0 +1,20 @@
+<UserReport>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'Customer'
+        Spinner:
+            id: customer_selector
+            on_text: root.determine_favorite_food()
+            values: root.pick_customer()
+
+    BoxLayout:
+        Label:
+            text: 'favorite food'
+        Label:
+            id: favorite_food
+
+    BoxLayout:
+        Button:
+            id: exit
+            text: 'exit'

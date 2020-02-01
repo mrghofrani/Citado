@@ -244,7 +244,6 @@ CREATE TABLE food_factor_log(
     food_name varchar(128),
     food_name_start_time date,
     food_price_start_time date,
-    quantity int not null,
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
     PRIMARY KEY (factor_int, food_name, food_name_start_time),
@@ -318,7 +317,6 @@ CREATE TABLE factor_ingredient_log(
     factor_id int,
     ingredient_name varchar(32),
     ingredient_start_time date,
-    quantity int not null,
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
     PRIMARY KEY (factor_id, ingredient_name, ingredient_start_time),
@@ -502,8 +500,8 @@ CREATE TRIGGER delete_factor_log_trigger AFTER DELETE ON factor_of_food
 CREATE OR REPLACE FUNCTION insert_food_factor_log()
   RETURNS trigger AS $$
           BEGIN
-            INSERT INTO food_factor_log(factor_int, food_name, food_name , action, quantity)
-            VALUES(NEW.factor_int, NEW.food_name, NEW.food_name, 'insert', NEW.quantity);
+            INSERT INTO food_factor_log(factor_int, food_name, food_name_start_time, food_price_start_time, action)
+            VALUES(NEW.factor_int, NEW.food_name, NEW.food_name_start_time, NEW.food_price_start_time, 'insert');
             RETURN NEW;
         END;
     $$LANGUAGE plpgsql;
@@ -511,8 +509,8 @@ CREATE OR REPLACE FUNCTION insert_food_factor_log()
 CREATE OR REPLACE FUNCTION update_food_factor_log()
   RETURNS trigger AS $$
           BEGIN
-            INSERT INTO food_factor_log(factor_int, food_name, food_name , action, quantity)
-            VALUES(NEW.factor_int, NEW.food_name, NEW.food_name, 'update', NEW.quantity);
+            INSERT INTO food_factor_log(factor_int, food_name, food_name_start_time, food_price_start_time, action)
+            VALUES(NEW.factor_int, NEW.food_name, NEW.food_name_start_time, NEW.food_price_start_time, 'update');
             RETURN NEW;
         END;
     $$LANGUAGE plpgsql;
@@ -520,8 +518,8 @@ CREATE OR REPLACE FUNCTION update_food_factor_log()
 CREATE OR REPLACE FUNCTION delete_food_factor_log()
   RETURNS trigger AS $$
           BEGIN
-            INSERT INTO food_factor_log(factor_int, food_name, food_name , action, quantity)
-            VALUES(OLD.factor_int, OLD.food_name, OLD.food_name, 'delete', OLD.quantity);
+            INSERT INTO food_factor_log(factor_int, food_name, food_name_start_time, food_price_start_time, action)
+            VALUES(NEW.factor_int, NEW.food_name, NEW.food_name_start_time, NEW.food_price_start_time, 'delete');
             RETURN OLD;
         END;
     $$LANGUAGE plpgsql;
@@ -747,8 +745,8 @@ CREATE TRIGGER delete_store_factor_log_trigger AFTER DELETE ON factor_customer
 CREATE OR REPLACE FUNCTION insert_factor_ingredient_log()
   RETURNS trigger AS $$
           BEGIN
-            INSERT INTO factor_ingredient_log(factor_id, ingredient_name, ingredient_start_time, quantity, action)
-            VALUES(NEW.factor_id, NEW.ingredient_name, NEW.ingredient_start_time, NEW.quantity, 'insert');
+            INSERT INTO factor_ingredient_log(factor_id, ingredient_name, ingredient_start_time,  action)
+            VALUES(NEW.factor_id, NEW.ingredient_name, NEW.ingredient_start_time,'insert');
             RETURN NEW;
         END;
     $$LANGUAGE plpgsql;
@@ -756,8 +754,8 @@ CREATE OR REPLACE FUNCTION insert_factor_ingredient_log()
 CREATE OR REPLACE FUNCTION update_factor_ingredient_log()
   RETURNS trigger AS $$
           BEGIN
-            INSERT INTO factor_ingredient_log(factor_id, ingredient_name, ingredient_start_time, quantity, action)
-            VALUES(NEW.factor_id, NEW.ingredient_name, NEW.ingredient_start_time, NEW.quantity, 'update');
+            INSERT INTO factor_ingredient_log(factor_id, ingredient_name, ingredient_start_time,  action)
+            VALUES(NEW.factor_id, NEW.ingredient_name, NEW.ingredient_start_time, 'update');
             RETURN NEW;
         END;
     $$LANGUAGE plpgsql;
@@ -765,8 +763,8 @@ CREATE OR REPLACE FUNCTION update_factor_ingredient_log()
 CREATE OR REPLACE FUNCTION delete_factor_ingredient_log()
   RETURNS trigger AS $$
           BEGIN
-            INSERT INTO factor_ingredient_log(factor_id, ingredient_name, ingredient_start_time, quantity, action)
-            VALUES(OLD.factor_id, OLD.ingredient_name, OLD.ingredient_start_time, OLD.quantity, 'delete');
+            INSERT INTO factor_ingredient_log(factor_id, ingredient_name, ingredient_start_time, action)
+            VALUES(OLD.factor_id, OLD.ingredient_name, OLD.ingredient_start_time,'delete');
             RETURN OLD;
         END;
     $$LANGUAGE plpgsql;

@@ -1,90 +1,45 @@
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.lang import Builder
-from database import query, update
+from database import query
 
-Builder.load_file('report/admin/admin.kv')
-
-
-class AdminReport(BoxLayout):
-    def pick_dates(self):
-        postgres_qeury = """SELECT DISTINCT date
-                            FROM factor_of_food 
-                            UNION 
-                            SELECT DISTINCT date
-                            FROM factor_of_ingredient"""
-        self.dates = query(postgres_qeury, "factor_of_food")
-        dates = []
-        if self.dates:
-            for row in self.dates:
-                dates.append(str(row[0]))
-        if dates:
-            self.ids.date_selector.text = dates[0]
-        return dates
-
-    def update(self):
-        if self.ids.buy.state == "down":
-            date = self.ids.date_selector.text
-            postgres_query = """SELECT factor_int, food_name, price, quantity
-                                FROM food_factor INNER JOIN food ON food_factor.food_name = food.name and food_factor.food_name_start_time = food.name_start_time and food_factor.food_price_start_time = food.price_start_time
-                                WHERE factor_int
-                                IN (SELECT id
-                                    FROM factor_of_food
-                                    WHERE date = %s)"""
-            values = (date,)
-            list_of_food = query(postgres_query, "food_factor", values)
-            sum = 0
-            for row in list_of_food:
-                sum += row[2] * row[3]
-            self.ids.result.text = str(list_of_food)
-            self.ids.value.text = str(sum)
-        elif self.ids.sold.state == "down":
-            date = self.ids.date_selector.text
-            postgres_query = """SELECT factor_id, ingredient_name, price, quantity
-                                FROM ingredient INNER JOIN factor_ingredient fi on ingredient.name = fi.ingredient_name and ingredient.start_time = fi.ingredient_start_time
-                                WHERE factor_id
-                                IN (SELECT id
-                                    FROM factor_of_ingredient
-                                    WHERE date = %s)"""
-            values = (date,)
-            list_of_food = query(postgres_query, "ingredient_factor", values)
-            sum = 0
-            for row in list_of_food:
-                sum += row[2] * row[3]
-            self.ids.result.text = str(list_of_food)
-            self.ids.value.text = str(sum)
-        elif self.ids.total.state == "down":
-            date = self.ids.date_selector.text
-            postgres_query = """SELECT factor_int, food_name, price, quantity
-                                           FROM food_factor INNER JOIN food ON food_factor.food_name = food.name and food_factor.food_name_start_time = food.name_start_time and food_factor.food_price_start_time = food.price_start_time
-                                           WHERE factor_int
-                                           IN (SELECT id
-                                               FROM factor_of_food
-                                               WHERE date = %s)"""
-            values = (date,)
-            list_of_food = query(postgres_query, "food_factor", values)
-            food_sum = 0
-            for row in list_of_food:
-                food_sum += row[2] * row[3]
-
-            postgres_query = """SELECT factor_id, ingredient_name, price, quantity
-                                            FROM ingredient INNER JOIN factor_ingredient fi on ingredient.name = fi.ingredient_name and ingredient.start_time = fi.ingredient_start_time
-                                            WHERE factor_id
-                                            IN (SELECT id
-                                                FROM factor_of_ingredient
-                                                WHERE date = %s)"""
-            values = (date,)
-            list_of_ingredient = query(postgres_query, "ingredient_factor", values)
-            ingredient_sum = 0
-            for row in list_of_ingredient:
-                ingredient_sum += row[2] * row[3]
-            alist = list_of_ingredient + list_of_food
-            self.ids.result.text = str(alist)
-            self.ids.value.text = str(food_sum - ingredient_sum)
+Builder.load_file('report/user/user.kv')
 
 
-def show_admin_report_popup():
-    show = AdminReport()
-    popup_window = Popup(title="Admin Report", content=show)
+class UserReport(BoxLayout):
+    def pick_customer(self):
+        postgres_qeury = """SELECT * 
+                            FROM customer"""
+        self.customers = query(postgres_qeury, "customer")
+        customers = []
+        if self.customers:
+            for row in self.customers:
+                customers.append(str(row[0]))
+        if customers:
+            self.ids.customer_selector.text = customers[0]
+        return customers
+
+    def determine_favorite_food(self):
+        customer = self.ids.customer_selector.text
+
+        postgres_query = """SELECT sum(quantity), food_name 
+                            FROM food_factor
+                            WHERE factor_int IN (SELECT factor_id
+                                                 FROM factor_customer
+                                                 WHERE customer_national_code=%s)
+                            GROUP BY food_name 
+                            ORDER BY sum(quantity) DESC"""
+        values = (customer,)
+        self.favorite_food = query(postgres_query, "food_factor", values)
+        print(self.favorite_food)
+        if self.favorite_food:
+            self.ids.favorite_food.text = str(self.favorite_food[0][1])
+        else:
+            self.ids.favorite_food.text = ""
+
+
+def show_user_report_popup():
+    show = UserReport()
+    popup_window = Popup(title="User Report", content=show)
     show.ids.exit.bind(on_press=popup_window.dismiss)
     popup_window.open()
