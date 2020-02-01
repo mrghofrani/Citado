@@ -168,6 +168,7 @@ CREATE TRIGGER validate_bike_delivery_mobile_number BEFORE INSERT ON bike
 
 
 CREATE TABLE customer_log(
+    id serial,
     national_code char(10),
     first_name varchar(32) not null,
     last_name varchar(32) not null,
@@ -175,31 +176,33 @@ CREATE TABLE customer_log(
     age numeric(3,0) not null,
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
-    PRIMARY KEY (national_code)
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE address_log(
+    id serial,
     phone char(7),
     name varchar(128) not null,
     address varchar(512) not null,
     customer char(10) not null,
-    PRIMARY KEY(phone),
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
-    FOREIGN KEY (customer) REFERENCES customer
+    PRIMARY KEY(id)
 );
 
 CREATE TABLE bike_log(
+    id serial,
     national_code char(10),
     first_name varchar(32) not null,
     last_name varchar(32) not null,
     mobile_number char(12) not null,
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
-    PRIMARY KEY (national_code)
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE food_log (
+    id serial,
     name varchar(128) NOT NULL ,
     price numeric(4,2) NOT NULL ,
     name_start_time date NOT NULL ,
@@ -208,7 +211,7 @@ CREATE TABLE food_log (
     price_end_time date NOT NULL ,
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
-    PRIMARY KEY(name, name_start_time, price_start_time)
+    PRIMARY KEY(id)
 );
 
 CREATE TABLE factor_of_food_log(
@@ -220,66 +223,63 @@ CREATE TABLE factor_of_food_log(
 );
 
 CREATE TABLE factor_customer_log(
+    id serial,
     factor_id int,
     customer_national_code char(10),
-    PRIMARY KEY (factor_id),
-    FOREIGN KEY (factor_id) REFERENCES factor_of_food,
-    FOREIGN KEY (customer_national_code) REFERENCES customer,
     log_time timestamp NOT NULL default NOW(),
-    action varchar(10) NOT NULL
+    action varchar(10) NOT NULL,
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE factor_address_log(
+    id serial,
     factor_id int,
     address_phone char(7),
-    PRIMARY KEY (factor_id),
-    FOREIGN KEY (factor_id) REFERENCES factor_of_food,
-    FOREIGN KEY (address_phone) REFERENCES address,
     log_time timestamp NOT NULL default NOW(),
-    action varchar(10) NOT NULL
+    action varchar(10) NOT NULL,
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE food_factor_log(
+    id serial,
     factor_int int,
     food_name varchar(128),
     food_name_start_time date,
     food_price_start_time date,
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
-    PRIMARY KEY (factor_int, food_name, food_name_start_time),
-    FOREIGN KEY (factor_int) REFERENCES factor_of_food,
-    FOREIGN KEY (food_name, food_name_start_time, food_price_start_time) REFERENCES food
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE delivery_log(
+    id serial,
     factor_id int,
     address_phone char(7),
     bike_delivery_national_code char(10),
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
-    PRIMARY KEY(factor_id),
-    FOREIGN KEY (factor_id) REFERENCES factor_of_food,
-    FOREIGN KEY (address_phone) REFERENCES address,
-    FOREIGN KEY (bike_delivery_national_code) REFERENCES bike
+    PRIMARY KEY(id)
 );
 
 CREATE TABLE store_log(
+    id serial,
     name varchar(128) not null,
     start_time date not null,
     end_time date not null,
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
-    PRIMARY KEY (name, start_time)
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE ingredient_log(
+    id serial,
     name varchar(32),
     price numeric(4,2) not null,
     start_time date,
     end_time date not null,
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
-    PRIMARY KEY (name, start_time)
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE factor_of_ingredient_log(
@@ -291,37 +291,34 @@ CREATE TABLE factor_of_ingredient_log(
 );
 
 CREATE TABLE store_ingredient_log(
+    id serial,
     store_name varchar(128),
     store_start_time date,
     ingredient_name varchar(32),
     ingredient_start_time date,
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
-    PRIMARY KEY (store_name, store_start_time, ingredient_name, ingredient_start_time),
-    FOREIGN KEY (store_name, store_start_time) REFERENCES store,
-    FOREIGN KEY (ingredient_name, ingredient_start_time) REFERENCES  ingredient
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE store_factor_log(
+    id serial,
     factor_id int,
     store_name varchar(128),
     store_start_time date,
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
-    PRIMARY KEY (factor_id),
-    FOREIGN KEY (factor_id) REFERENCES factor_of_ingredient,
-    FOREIGN KEY (store_name, store_start_time) REFERENCES store
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE factor_ingredient_log(
+    id serial,
     factor_id int,
     ingredient_name varchar(32),
     ingredient_start_time date,
     log_time timestamp NOT NULL default NOW(),
     action varchar(10) NOT NULL,
-    PRIMARY KEY (factor_id, ingredient_name, ingredient_start_time),
-    FOREIGN KEY (factor_id) REFERENCES factor_of_ingredient,
-    FOREIGN KEY (ingredient_name, ingredient_start_time) REFERENCES ingredient
+    PRIMARY KEY (id)
 );
 
 CREATE OR REPLACE FUNCTION insert_customer_log() RETURNS trigger AS $$
@@ -569,8 +566,8 @@ CREATE TRIGGER delete_store_log_trigger AFTER DELETE ON store
 CREATE OR REPLACE FUNCTION insert_ingredient_log()
   RETURNS trigger AS $$
           BEGIN
-            INSERT INTO ingredient_log(name, price, end_time, action)
-            VALUES(NEW.name, NEW.price, NEW.end_time, 'insert');
+            INSERT INTO ingredient_log(name, start_time, price, end_time, action)
+            VALUES(NEW.name, NEW.start_time, NEW.price, NEW.end_time, 'insert');
             RETURN NEW;
         END;
     $$LANGUAGE plpgsql;
@@ -578,8 +575,8 @@ CREATE OR REPLACE FUNCTION insert_ingredient_log()
 CREATE OR REPLACE FUNCTION update_ingredient_log()
   RETURNS trigger AS $$
           BEGIN
-            INSERT INTO ingredient_log(name, price, end_time, action)
-            VALUES(NEW.name, NEW.price, NEW.end_time, 'update');
+            INSERT INTO ingredient_log(name, start_time, price, end_time, action)
+            VALUES(NEW.name, NEW.start_time, NEW.price, NEW.end_time, 'update');
             RETURN NEW;
         END;
     $$LANGUAGE plpgsql;
@@ -587,8 +584,8 @@ CREATE OR REPLACE FUNCTION update_ingredient_log()
 CREATE OR REPLACE FUNCTION delete_ingredient_log()
   RETURNS trigger AS $$
           BEGIN
-            INSERT INTO ingredient_log(name, price, end_time, action)
-            VALUES(OLD.name, OLD.price, OLD.end_time, 'delete');
+            INSERT INTO ingredient_log(name, start_time, price, end_time, action)
+            VALUES(OLD.name, OLD.start_time, OLD.price, OLD.end_time, 'delete');
             RETURN OLD;
         END;
     $$LANGUAGE plpgsql;
@@ -846,5 +843,4 @@ CREATE TRIGGER update_store_factor_log_trigger AFTER UPDATE ON store_ingredient
     FOR EACH ROW EXECUTE PROCEDURE update_store_ingredient_log();
 CREATE TRIGGER delete_store_factor_log_trigger AFTER DELETE ON store_ingredient
     FOR EACH ROW EXECUTE PROCEDURE delete_store_ingredient_log();
-
 

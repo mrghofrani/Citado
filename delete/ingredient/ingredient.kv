@@ -1,0 +1,42 @@
+<DeleteIngredientPopup>:
+    orientation: 'vertical'
+    BoxLayout:
+        Label:
+            text: 'ingredient'
+        Spinner:
+            id: ingredient_selector
+            text: 'Choose An Ingredient'
+            values: root.pick_values()
+            on_text: root.update_form()
+
+    BoxLayout:
+        Label:
+            text: 'start time'
+        Label:
+            id: start_time
+            text: ''
+
+    BoxLayout:
+        Label:
+            text: 'end time'
+        Label:
+            id: end_time
+            text: ''
+
+    BoxLayout:
+        Label:
+            text: 'price'
+        Label:
+            id: price
+            text: ''
+
+    BoxLayout:
+        Button:
+            id: delete
+            text: "delete"
+            on_release: root.delete()
+            disabled: True
+
+        Button:
+            id: cancel
+            text: "Cancel"
