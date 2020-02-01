@@ -1,0 +1,142 @@
+<CustomWidthTabb@TabbedPanelItem>
+    width: self.texture_size[0]
+    padding: 10, 0
+    size_hint_x: None
+
+<LogPopup>:
+    TabbedPanel:
+        size_hint: 1,1
+        do_default_tab: False
+        tab_width: None
+
+        CustomWidthTabb:
+            text: 'Customer'
+            on_press: root.return_query('customer_log')
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: customer_log
+
+
+        CustomWidthTabb:
+            text: 'Address'
+            on_press: root.return_query('address_log')
+
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: address_log
+
+        CustomWidthTabb:
+            text: 'Bike'
+            on_press: root.return_query('bike_log')
+
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: bike_log
+
+        CustomWidthTabb:
+            text: 'Food'
+            on_press: root.return_query('food_log')
+
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: food_log
+
+        CustomWidthTabb:
+            text: 'Factor of food'
+            on_press: root.return_query('factor_of_food_log')
+
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: factor_of_food_log
+
+        CustomWidthTabb:
+            text: 'Food Factor'
+            on_press: root.return_query('food_factor_log')
+
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: food_factor_log
+
+        CustomWidthTabb:
+            text: 'Store'
+            on_press: root.return_query('store_log')
+
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: store_log
+
+        CustomWidthTabb:
+            text: 'Ingredient'
+            on_press: root.return_query('ingredient_log')
+
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: ingredient_log
+
+        CustomWidthTabb:
+            text: 'Store Factor'
+            on_press: root.return_query('store_factor_log')
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: store_factor_log
+
+        CustomWidthTabb:
+            text: 'Store Ingredient'
+            on_press: root.return_query('store_ingredient_log')
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: store_ingredient_log
+
+        CustomWidthTabb:
+            text: 'Factor of ingredient'
+            on_press: root.return_query('factor_of_ingredient_log')
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: factor_of_ingredient_log
+
+        CustomWidthTabb:
+            text: 'Factor Ingredient'
+            on_press: root.return_query('factor_ingredient_log')
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: factor_ingredient_log
+
+        CustomWidthTabb:
+            text: 'Delivery'
+            on_press: root.return_query('delivery_log')
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: delivery_log
+
+        CustomWidthTabb:
+            text: 'Factor Address'
+            on_press: root.return_query('factor_address_log')
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: factor_address_log
+
+        CustomWidthTabb:
+            text: 'Factor Customer'
+            on_press: root.return_query('factor_customer_log')
+            ScrollView:
+                BoxLayout:
+                    orientation: 'vertical'
+                    id: factor_customer_log
+
+        CustomWidthTabb:
+            text: 'cancel'
+            id: cancel

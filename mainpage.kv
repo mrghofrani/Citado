@@ -20,10 +20,15 @@
         padding: 10
         spacing: 10
 
-        Button:
-            id: manage_db
-            text: 'Manage DB'
-            on_press: print("Pressed")
+        BoxLayout:
+            Button:
+                id: log
+                text: 'Show logs'
+                on_press: root.log_button()
+            Button:
+                id: manage_db
+                text: 'Manage DB'
+                on_press: print("Pressed")
 
         Button:
             id: order_food
