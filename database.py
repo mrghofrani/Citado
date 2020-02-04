@@ -92,3 +92,20 @@ def delete(postgres_delete_query, values, table):
             cursor.close()
             connection.close()
 
+
+def file_executer(file_path):
+    connection, cursor = None, None
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        with open(file_path) as file:
+            cursor.execute(file.read())
+            connection.commit()
+    except (Exception, psycopg2.Error) as error:
+        print(f"Failed to insert record into table {file_path}", error)
+    finally:
+        # closing database connection.
+        if connection:
+            cursor.close()
+            connection.close()
+

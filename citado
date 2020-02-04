@@ -1,0 +1,2928 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 10.10 (Ubuntu 10.10-0ubuntu0.18.04.1)
+-- Dumped by pg_dump version 10.10 (Ubuntu 10.10-0ubuntu0.18.04.1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: pg_cron; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_cron WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_cron; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION pg_cron IS 'Job scheduler for PostgreSQL';
+
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- Name: check_mobile(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.check_mobile() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        IF isnumeric(NEW.mobile_number) THEN
+            RETURN NEW;
+        END IF;
+        RETURN NULL;
+    END;
+    $$;
+
+
+ALTER FUNCTION public.check_mobile() OWNER TO engmrgh;
+
+--
+-- Name: check_phone(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.check_phone() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        IF isnumeric(NEW.phone) THEN
+            RETURN NEW;
+        END IF;
+        RETURN NULL;
+    END;
+    $$;
+
+
+ALTER FUNCTION public.check_phone() OWNER TO engmrgh;
+
+--
+-- Name: delete_address_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_address_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO address_log(phone, address, customer, name, action)
+            VALUES(NEW.phone, NEW.address, NEW.customer, NEW.name, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_address_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_bike_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_bike_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO bike_log(national_code, first_name, last_name, mobile_number, action)
+            VALUES(OLD.national_code,OLD.first_name, OLD.last_name, OLD.mobile_number, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_bike_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_customer_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_customer_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO customer_log(national_code, first_name, last_name, age, mobile_number, action)
+            VALUES(OLD.national_code, OLD.first_name, OLD.last_name, OLD.age, OLD.mobile_number, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_customer_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_delivery_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_delivery_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO delivery_log(factor_id, address_phone, bike_delivery_national_code, action)
+            VALUES(OLD.factor_id, OLD.address_phone, OLD.bike_delivery_national_code, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_delivery_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_factor_address_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_factor_address_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_address_log(factor_id, address_phone, action)
+            VALUES(OLD.factor_id, OLD.address_phone, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_factor_address_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_factor_customer_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_factor_customer_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_customer_log(factor_id, customer_national_code, action)
+            VALUES(OLD.factor_id, OLD.customer_national_code, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_factor_customer_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_factor_ingredient_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_factor_ingredient_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_ingredient_log(factor_id, ingredient_name, ingredient_start_time, quantity, action)
+            VALUES(OLD.factor_id, OLD.ingredient_name, OLD.ingredient_start_time, OLD.quantity, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_factor_ingredient_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_factor_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_factor_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_log(factor_id, action)
+            VALUES(OLD.id, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_factor_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_food_factor_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_food_factor_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO food_factor_log(factor_int, food_name, food_name_start_time, food_price_start_time, quantity, action)
+            VALUES(NEW.factor_int, NEW.food_name, NEW.food_name_start_time, NEW.food_price_start_time, NEW.quantity, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_food_factor_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_food_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_food_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO food_log(name, name_start_time, price, price_start_time, price_end_time, name_end_time, action)
+            VALUES(OLD.name, OLD.name_start_time, OLD.price, OLD.price_start_time, OLD.price_end_time, OLD.name_end_time, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_food_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_ingredient_factor_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_ingredient_factor_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_of_ingredient_log(id, date, action)
+            VALUES(OLD.id, OLD.date, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_ingredient_factor_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_ingredient_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_ingredient_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO ingredient_log(name, start_time, price, end_time, action)
+            VALUES(OLD.name, OLD.start_time, OLD.price, OLD.end_time, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_ingredient_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_material_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_material_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO ingredient_log(name, price, end_time, action)
+            VALUES(OLD.name, OLD.price, OLD.end_time, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_material_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_store_factor_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_store_factor_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO store_factor_log(factor_id, store_name, store_start_time, action)
+            VALUES(OLD.factor_id, OLD.store_name, OLD.store_start_time, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_store_factor_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_store_ingredient_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_store_ingredient_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO store_ingredient_log(store_name, store_start_time, ingredient_name, ingredient_start_time, action)
+            VALUES(OLD.store_name, OLD.store_start_time, OLD.ingredient_name, OLD.ingredient_start_time, 'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_store_ingredient_log() OWNER TO engmrgh;
+
+--
+-- Name: delete_store_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.delete_store_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO store_log(name, start_time, end_time, action)
+            VALUES(NEW.name, NEW.start_time, NEW.end_time ,'delete');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.delete_store_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_address_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_address_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+
+        BEGIN
+            INSERT INTO address_log(phone, address, customer, name, action)
+            VALUES(NEW.phone, NEW.address, NEW.customer, NEW.name,'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_address_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_bike_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_bike_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO bike_log(national_code, first_name, last_name, mobile_number, action)
+            VALUES(NEW.national_code,NEW.first_name, NEW.last_name, NEW.mobile_number, 'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_bike_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_customer_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_customer_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        INSERT INTO customer_log(national_code, first_name, last_name, age, mobile_number, action)
+        VALUES(NEW.national_code, NEW.first_name, NEW.last_name, NEW.age, NEW.mobile_number, 'insert');
+        RETURN NEW;
+    END;
+    $$;
+
+
+ALTER FUNCTION public.insert_customer_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_delivery_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_delivery_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO delivery_log(factor_id, address_phone, bike_delivery_national_code, action)
+            VALUES(NEW.factor_id, NEW.address_phone, NEW.bike_delivery_national_code, 'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_delivery_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_factor_address_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_factor_address_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_address_log(factor_id, address_phone, action)
+            VALUES(NEW.factor_id, NEW.address_phone, 'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_factor_address_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_factor_customer_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_factor_customer_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_customer_log(factor_id, customer_national_code, action)
+            VALUES(NEW.factor_id, NEW.customer_national_code, 'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_factor_customer_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_factor_ingredient_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_factor_ingredient_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_ingredient_log(factor_id, ingredient_name, ingredient_start_time, quantity, action)
+            VALUES(NEW.factor_id, NEW.ingredient_name, NEW.ingredient_start_time, NEW.quantity, 'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_factor_ingredient_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_food_factor_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_food_factor_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO food_factor_log(factor_int, food_name, food_name_start_time, food_price_start_time, quantity, action)
+            VALUES(NEW.factor_int, NEW.food_name, NEW.food_name_start_time, NEW.food_price_start_time, NEW.quantity, 'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_food_factor_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_food_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_food_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO food_log(name, name_start_time, price, price_start_time, price_end_time, name_end_time, action)
+            VALUES(NEW.name, NEW.name_start_time, NEW.price, NEW.price_start_time, NEW.price_end_time, NEW.name_end_time, 'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_food_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_ingredient_factor_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_ingredient_factor_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_of_ingredient_log(id, date, action)
+            VALUES(NEW.id, NEW.date, 'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_ingredient_factor_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_ingredient_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_ingredient_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO ingredient_log(name, start_time, price, end_time, action)
+            VALUES(NEW.name, NEW.start_time, NEW.price, NEW.end_time, 'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_ingredient_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_store_factor_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_store_factor_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO store_factor_log(factor_id, store_name, store_start_time, action)
+            VALUES(NEW.factor_id, NEW.store_name, NEW.store_start_time, 'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_store_factor_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_store_ingredient_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_store_ingredient_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO store_ingredient_log(store_name, store_start_time, ingredient_name, ingredient_start_time, action)
+            VALUES(NEW.store_name, NEW.store_start_time, NEW.ingredient_name, NEW.ingredient_start_time, 'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_store_ingredient_log() OWNER TO engmrgh;
+
+--
+-- Name: insert_store_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.insert_store_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO store_log(name, start_time, end_time, action)
+            VALUES(NEW.name, NEW.start_time, NEW.end_time ,'insert');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.insert_store_log() OWNER TO engmrgh;
+
+--
+-- Name: isnumeric(text); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.isnumeric(text) RETURNS boolean
+    LANGUAGE plpgsql IMMUTABLE STRICT
+    AS $_$
+    DECLARE x NUMERIC;
+    BEGIN
+        x = $1::NUMERIC;
+        RETURN TRUE;
+    EXCEPTION WHEN others THEN
+        RETURN FALSE;
+    END;
+$_$;
+
+
+ALTER FUNCTION public.isnumeric(text) OWNER TO engmrgh;
+
+--
+-- Name: update_address_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_address_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO address_log(phone, address, customer, name, action)
+            VALUES(NEW.phone, NEW.address, NEW.customer, NEW.name, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_address_log() OWNER TO engmrgh;
+
+--
+-- Name: update_bike_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_bike_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO bike_log(national_code, first_name, last_name, mobile_number, action)
+            VALUES(NEW.national_code,NEW.first_name, NEW.last_name, NEW.mobile_number, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_bike_log() OWNER TO engmrgh;
+
+--
+-- Name: update_customer_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_customer_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+            INSERT INTO customer_log(national_code, first_name, last_name, age, mobile_number, action)
+            VALUES(NEW.national_code, NEW.first_name, NEW.last_name, NEW.age, NEW.mobile_number, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_customer_log() OWNER TO engmrgh;
+
+--
+-- Name: update_delivery_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_delivery_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO delivery_log(factor_id, address_phone, bike_delivery_national_code, action)
+            VALUES(NEW.factor_id, NEW.address_phone, NEW.bike_delivery_national_code, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_delivery_log() OWNER TO engmrgh;
+
+--
+-- Name: update_factor_address_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_factor_address_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_address_log(factor_id, address_phone, action)
+            VALUES(NEW.factor_id, NEW.address_phone, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_factor_address_log() OWNER TO engmrgh;
+
+--
+-- Name: update_factor_customer_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_factor_customer_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_customer_log(factor_id, customer_national_code, action)
+            VALUES(NEW.factor_id, NEW.customer_national_code, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_factor_customer_log() OWNER TO engmrgh;
+
+--
+-- Name: update_factor_ingredient_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_factor_ingredient_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_ingredient_log(factor_id, ingredient_name, ingredient_start_time, quantity, action)
+            VALUES(NEW.factor_id, NEW.ingredient_name, NEW.ingredient_start_time, NEW.quantity, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_factor_ingredient_log() OWNER TO engmrgh;
+
+--
+-- Name: update_factor_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_factor_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_log(factor_id, action)
+            VALUES(NEW.id, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_factor_log() OWNER TO engmrgh;
+
+--
+-- Name: update_food_factor_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_food_factor_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO food_factor_log(factor_int, food_name, food_name_start_time, food_price_start_time, quantity, action)
+            VALUES(NEW.factor_int, NEW.food_name, NEW.food_name_start_time, NEW.food_price_start_time, NEW.quantity,  'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_food_factor_log() OWNER TO engmrgh;
+
+--
+-- Name: update_food_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_food_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO food_log(name, name_start_time, price, price_start_time, price_end_time, name_end_time, action)
+            VALUES(NEW.name, NEW.name_start_time, NEW.price, NEW.price_start_time, NEW.price_end_time, NEW.name_end_time, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_food_log() OWNER TO engmrgh;
+
+--
+-- Name: update_ingredient_factor_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_ingredient_factor_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO factor_of_ingredient_log(id, date, action)
+            VALUES(NEW.id, NEW.date, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_ingredient_factor_log() OWNER TO engmrgh;
+
+--
+-- Name: update_ingredient_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_ingredient_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO ingredient_log(name, start_time, price, end_time, action)
+            VALUES(NEW.name, NEW.start_time, NEW.price, NEW.end_time, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_ingredient_log() OWNER TO engmrgh;
+
+--
+-- Name: update_material_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_material_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO ingredient_log(name, price, end_time, action)
+            VALUES(NEW.name, NEW.price, NEW.end_time, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_material_log() OWNER TO engmrgh;
+
+--
+-- Name: update_store_factor_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_store_factor_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO store_factor_log(factor_id, store_name, store_start_time, action)
+            VALUES(NEW.factor_id, NEW.store_name, NEW.store_start_time, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_store_factor_log() OWNER TO engmrgh;
+
+--
+-- Name: update_store_ingredient_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_store_ingredient_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO store_ingredient_log(store_name, store_start_time, ingredient_name, ingredient_start_time, action)
+            VALUES(NEW.store_name, NEW.store_start_time, NEW.ingredient_name, NEW.ingredient_start_time, 'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_store_ingredient_log() OWNER TO engmrgh;
+
+--
+-- Name: update_store_log(); Type: FUNCTION; Schema: public; Owner: engmrgh
+--
+
+CREATE FUNCTION public.update_store_log() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            INSERT INTO store_log(name, start_time, end_time, action)
+            VALUES(NEW.name, NEW.start_time, NEW.end_time ,'update');
+            RETURN NEW;
+        END;
+    $$;
+
+
+ALTER FUNCTION public.update_store_log() OWNER TO engmrgh;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: address; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.address (
+    phone character(7) NOT NULL,
+    name character varying(128) NOT NULL,
+    address character varying(512) NOT NULL,
+    customer character(10) NOT NULL
+);
+
+
+ALTER TABLE public.address OWNER TO engmrgh;
+
+--
+-- Name: address_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.address_log (
+    id integer NOT NULL,
+    phone character(7),
+    name character varying(128) NOT NULL,
+    address character varying(512) NOT NULL,
+    customer character(10) NOT NULL,
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.address_log OWNER TO engmrgh;
+
+--
+-- Name: address_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.address_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.address_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: address_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.address_log_id_seq OWNED BY public.address_log.id;
+
+
+--
+-- Name: bike; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.bike (
+    national_code character(10) NOT NULL,
+    first_name character varying(32) NOT NULL,
+    last_name character varying(32) NOT NULL,
+    mobile_number character(12) NOT NULL
+);
+
+
+ALTER TABLE public.bike OWNER TO engmrgh;
+
+--
+-- Name: bike_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.bike_log (
+    national_code character(10) NOT NULL,
+    first_name character varying(32) NOT NULL,
+    last_name character varying(32) NOT NULL,
+    mobile_number character(12) NOT NULL,
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.bike_log OWNER TO engmrgh;
+
+--
+-- Name: customer; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.customer (
+    national_code character(10) NOT NULL,
+    first_name character varying(32) NOT NULL,
+    last_name character varying(32) NOT NULL,
+    mobile_number character(12) NOT NULL,
+    age numeric(3,0) NOT NULL
+);
+
+
+ALTER TABLE public.customer OWNER TO engmrgh;
+
+--
+-- Name: customer_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.customer_log (
+    id integer NOT NULL,
+    national_code character(10),
+    first_name character varying(32) NOT NULL,
+    last_name character varying(32) NOT NULL,
+    mobile_number character(12) NOT NULL,
+    age numeric(3,0) NOT NULL,
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.customer_log OWNER TO engmrgh;
+
+--
+-- Name: customer_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.customer_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.customer_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: customer_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.customer_log_id_seq OWNED BY public.customer_log.id;
+
+
+--
+-- Name: delivery; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.delivery (
+    factor_id integer NOT NULL,
+    address_phone character(7),
+    bike_delivery_national_code character(10)
+);
+
+
+ALTER TABLE public.delivery OWNER TO engmrgh;
+
+--
+-- Name: delivery_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.delivery_log (
+    id integer NOT NULL,
+    factor_id integer,
+    address_phone character(7),
+    bike_delivery_national_code character(10),
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.delivery_log OWNER TO engmrgh;
+
+--
+-- Name: delivery_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.delivery_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.delivery_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: delivery_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.delivery_log_id_seq OWNED BY public.delivery_log.id;
+
+
+--
+-- Name: factor_address; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.factor_address (
+    factor_id integer NOT NULL,
+    address_phone character(7)
+);
+
+
+ALTER TABLE public.factor_address OWNER TO engmrgh;
+
+--
+-- Name: factor_address_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.factor_address_log (
+    id integer NOT NULL,
+    factor_id integer,
+    address_phone character(7),
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.factor_address_log OWNER TO engmrgh;
+
+--
+-- Name: factor_address_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.factor_address_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.factor_address_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: factor_address_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.factor_address_log_id_seq OWNED BY public.factor_address_log.id;
+
+
+--
+-- Name: factor_customer; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.factor_customer (
+    factor_id integer NOT NULL,
+    customer_national_code character(10)
+);
+
+
+ALTER TABLE public.factor_customer OWNER TO engmrgh;
+
+--
+-- Name: factor_customer_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.factor_customer_log (
+    id integer NOT NULL,
+    factor_id integer,
+    customer_national_code character(10),
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.factor_customer_log OWNER TO engmrgh;
+
+--
+-- Name: factor_customer_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.factor_customer_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.factor_customer_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: factor_customer_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.factor_customer_log_id_seq OWNED BY public.factor_customer_log.id;
+
+
+--
+-- Name: factor_ingredient; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.factor_ingredient (
+    factor_id integer NOT NULL,
+    ingredient_name character varying(32) NOT NULL,
+    ingredient_start_time date NOT NULL,
+    quantity integer NOT NULL
+);
+
+
+ALTER TABLE public.factor_ingredient OWNER TO engmrgh;
+
+--
+-- Name: factor_ingredient_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.factor_ingredient_log (
+    id integer NOT NULL,
+    factor_id integer,
+    ingredient_name character varying(32),
+    ingredient_start_time date,
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.factor_ingredient_log OWNER TO engmrgh;
+
+--
+-- Name: factor_ingredient_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.factor_ingredient_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.factor_ingredient_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: factor_ingredient_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.factor_ingredient_log_id_seq OWNED BY public.factor_ingredient_log.id;
+
+
+--
+-- Name: factor_of_food; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.factor_of_food (
+    id integer NOT NULL,
+    date date NOT NULL
+);
+
+
+ALTER TABLE public.factor_of_food OWNER TO engmrgh;
+
+--
+-- Name: factor_of_food_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.factor_of_food_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.factor_of_food_id_seq OWNER TO engmrgh;
+
+--
+-- Name: factor_of_food_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.factor_of_food_id_seq OWNED BY public.factor_of_food.id;
+
+
+--
+-- Name: factor_of_food_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.factor_of_food_log (
+    id integer NOT NULL,
+    date date NOT NULL,
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.factor_of_food_log OWNER TO engmrgh;
+
+--
+-- Name: factor_of_food_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.factor_of_food_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.factor_of_food_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: factor_of_food_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.factor_of_food_log_id_seq OWNED BY public.factor_of_food_log.id;
+
+
+--
+-- Name: factor_of_ingredient; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.factor_of_ingredient (
+    id integer NOT NULL,
+    date date NOT NULL
+);
+
+
+ALTER TABLE public.factor_of_ingredient OWNER TO engmrgh;
+
+--
+-- Name: factor_of_ingredient_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.factor_of_ingredient_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.factor_of_ingredient_id_seq OWNER TO engmrgh;
+
+--
+-- Name: factor_of_ingredient_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.factor_of_ingredient_id_seq OWNED BY public.factor_of_ingredient.id;
+
+
+--
+-- Name: factor_of_ingredient_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.factor_of_ingredient_log (
+    id integer NOT NULL,
+    date date NOT NULL,
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.factor_of_ingredient_log OWNER TO engmrgh;
+
+--
+-- Name: factor_of_ingredient_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.factor_of_ingredient_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.factor_of_ingredient_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: factor_of_ingredient_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.factor_of_ingredient_log_id_seq OWNED BY public.factor_of_ingredient_log.id;
+
+
+--
+-- Name: food; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.food (
+    name character varying(128) NOT NULL,
+    price numeric(4,2) NOT NULL,
+    name_start_time date NOT NULL,
+    name_end_time date NOT NULL,
+    price_start_time date NOT NULL,
+    price_end_time date NOT NULL
+);
+
+
+ALTER TABLE public.food OWNER TO engmrgh;
+
+--
+-- Name: food_factor; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.food_factor (
+    factor_int integer NOT NULL,
+    food_name character varying(128) NOT NULL,
+    food_name_start_time date NOT NULL,
+    food_price_start_time date,
+    quantity integer NOT NULL
+);
+
+
+ALTER TABLE public.food_factor OWNER TO engmrgh;
+
+--
+-- Name: food_factor_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.food_factor_log (
+    id integer NOT NULL,
+    factor_int integer,
+    food_name character varying(128),
+    food_name_start_time date,
+    food_price_start_time date,
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.food_factor_log OWNER TO engmrgh;
+
+--
+-- Name: food_factor_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.food_factor_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.food_factor_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: food_factor_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.food_factor_log_id_seq OWNED BY public.food_factor_log.id;
+
+
+--
+-- Name: food_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.food_log (
+    id integer NOT NULL,
+    name character varying(128) NOT NULL,
+    price numeric(4,2) NOT NULL,
+    name_start_time date NOT NULL,
+    name_end_time date NOT NULL,
+    price_start_time date NOT NULL,
+    price_end_time date NOT NULL,
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.food_log OWNER TO engmrgh;
+
+--
+-- Name: food_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.food_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.food_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: food_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.food_log_id_seq OWNED BY public.food_log.id;
+
+
+--
+-- Name: ingredient; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.ingredient (
+    name character varying(32) NOT NULL,
+    price numeric(4,2) NOT NULL,
+    start_time date NOT NULL,
+    end_time date NOT NULL
+);
+
+
+ALTER TABLE public.ingredient OWNER TO engmrgh;
+
+--
+-- Name: ingredient_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.ingredient_log (
+    id integer NOT NULL,
+    name character varying(32),
+    price numeric(4,2) NOT NULL,
+    start_time date,
+    end_time date NOT NULL,
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.ingredient_log OWNER TO engmrgh;
+
+--
+-- Name: ingredient_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.ingredient_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.ingredient_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: ingredient_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.ingredient_log_id_seq OWNED BY public.ingredient_log.id;
+
+
+--
+-- Name: store; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.store (
+    name character varying(128) NOT NULL,
+    start_time date NOT NULL,
+    end_time date NOT NULL
+);
+
+
+ALTER TABLE public.store OWNER TO engmrgh;
+
+--
+-- Name: store_factor; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.store_factor (
+    factor_id integer NOT NULL,
+    store_name character varying(128),
+    store_start_time date
+);
+
+
+ALTER TABLE public.store_factor OWNER TO engmrgh;
+
+--
+-- Name: store_factor_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.store_factor_log (
+    id integer NOT NULL,
+    factor_id integer,
+    store_name character varying(128),
+    store_start_time date,
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.store_factor_log OWNER TO engmrgh;
+
+--
+-- Name: store_factor_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.store_factor_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.store_factor_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: store_factor_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.store_factor_log_id_seq OWNED BY public.store_factor_log.id;
+
+
+--
+-- Name: store_ingredient; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.store_ingredient (
+    store_name character varying(128) NOT NULL,
+    store_start_time date NOT NULL,
+    ingredient_name character varying(32) NOT NULL,
+    ingredient_start_time date NOT NULL
+);
+
+
+ALTER TABLE public.store_ingredient OWNER TO engmrgh;
+
+--
+-- Name: store_ingredient_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.store_ingredient_log (
+    id integer NOT NULL,
+    store_name character varying(128),
+    store_start_time date,
+    ingredient_name character varying(32),
+    ingredient_start_time date,
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.store_ingredient_log OWNER TO engmrgh;
+
+--
+-- Name: store_ingredient_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.store_ingredient_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.store_ingredient_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: store_ingredient_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.store_ingredient_log_id_seq OWNED BY public.store_ingredient_log.id;
+
+
+--
+-- Name: store_log; Type: TABLE; Schema: public; Owner: engmrgh
+--
+
+CREATE TABLE public.store_log (
+    id integer NOT NULL,
+    name character varying(128) NOT NULL,
+    start_time date NOT NULL,
+    end_time date NOT NULL,
+    log_time timestamp without time zone DEFAULT now() NOT NULL,
+    action character varying(10) NOT NULL
+);
+
+
+ALTER TABLE public.store_log OWNER TO engmrgh;
+
+--
+-- Name: store_log_id_seq; Type: SEQUENCE; Schema: public; Owner: engmrgh
+--
+
+CREATE SEQUENCE public.store_log_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.store_log_id_seq OWNER TO engmrgh;
+
+--
+-- Name: store_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: engmrgh
+--
+
+ALTER SEQUENCE public.store_log_id_seq OWNED BY public.store_log.id;
+
+
+--
+-- Name: address_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.address_log ALTER COLUMN id SET DEFAULT nextval('public.address_log_id_seq'::regclass);
+
+
+--
+-- Name: customer_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.customer_log ALTER COLUMN id SET DEFAULT nextval('public.customer_log_id_seq'::regclass);
+
+
+--
+-- Name: delivery_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.delivery_log ALTER COLUMN id SET DEFAULT nextval('public.delivery_log_id_seq'::regclass);
+
+
+--
+-- Name: factor_address_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_address_log ALTER COLUMN id SET DEFAULT nextval('public.factor_address_log_id_seq'::regclass);
+
+
+--
+-- Name: factor_customer_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_customer_log ALTER COLUMN id SET DEFAULT nextval('public.factor_customer_log_id_seq'::regclass);
+
+
+--
+-- Name: factor_ingredient_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_ingredient_log ALTER COLUMN id SET DEFAULT nextval('public.factor_ingredient_log_id_seq'::regclass);
+
+
+--
+-- Name: factor_of_food id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_of_food ALTER COLUMN id SET DEFAULT nextval('public.factor_of_food_id_seq'::regclass);
+
+
+--
+-- Name: factor_of_food_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_of_food_log ALTER COLUMN id SET DEFAULT nextval('public.factor_of_food_log_id_seq'::regclass);
+
+
+--
+-- Name: factor_of_ingredient id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_of_ingredient ALTER COLUMN id SET DEFAULT nextval('public.factor_of_ingredient_id_seq'::regclass);
+
+
+--
+-- Name: factor_of_ingredient_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_of_ingredient_log ALTER COLUMN id SET DEFAULT nextval('public.factor_of_ingredient_log_id_seq'::regclass);
+
+
+--
+-- Name: food_factor_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.food_factor_log ALTER COLUMN id SET DEFAULT nextval('public.food_factor_log_id_seq'::regclass);
+
+
+--
+-- Name: food_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.food_log ALTER COLUMN id SET DEFAULT nextval('public.food_log_id_seq'::regclass);
+
+
+--
+-- Name: ingredient_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.ingredient_log ALTER COLUMN id SET DEFAULT nextval('public.ingredient_log_id_seq'::regclass);
+
+
+--
+-- Name: store_factor_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store_factor_log ALTER COLUMN id SET DEFAULT nextval('public.store_factor_log_id_seq'::regclass);
+
+
+--
+-- Name: store_ingredient_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store_ingredient_log ALTER COLUMN id SET DEFAULT nextval('public.store_ingredient_log_id_seq'::regclass);
+
+
+--
+-- Name: store_log id; Type: DEFAULT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store_log ALTER COLUMN id SET DEFAULT nextval('public.store_log_id_seq'::regclass);
+
+
+--
+-- Data for Name: job; Type: TABLE DATA; Schema: cron; Owner: engmrgh
+--
+
+COPY cron.job (jobid, schedule, command, nodename, nodeport, database, username) FROM stdin;
+1	0 0 * * *	DELETE FROM address_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+2	0 0 * * *	DELETE FROM address_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+3	0 0 * * *	DELETE FROM bike_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+4	0 0 * * *	DELETE FROM customer_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+5	0 0 * * *	DELETE FROM delivery_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+6	0 0 * * *	DELETE FROM factor_address_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+7	0 0 * * *	DELETE FROM factor_customer_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+8	0 0 * * *	DELETE FROM factor_ingredient_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+9	0 0 * * *	DELETE FROM factor_of_food_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+10	0 0 * * *	DELETE FROM factor_of_ingredient_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+11	0 0 * * *	DELETE FROM food_factor_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+12	0 0 * * *	DELETE FROM food_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+13	0 0 * * *	DELETE FROM ingredient_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+14	0 0 * * *	DELETE FROM store_factor_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+15	0 0 * * *	DELETE FROM store_ingredient_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+16	0 0 * * *	DELETE FROM store_log WHERE event_time < now() - interval '3 day'	localhost	5432	citado	engmrgh
+\.
+
+
+--
+-- Data for Name: address; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.address (phone, name, address, customer) FROM stdin;
+5577446	Home	Ardabil	1548526785
+5577435	University	Tehran	1548526785
+5545768	Work	Tehran	7584532965
+4856217	Another restaurant	near the first restaurant	1548526785
+2548773	Best restaurant	near the WORST restaurant	1548526785
+\.
+
+
+--
+-- Data for Name: address_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.address_log (id, phone, name, address, customer, log_time, action) FROM stdin;
+\.
+
+
+--
+-- Data for Name: bike; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.bike (national_code, first_name, last_name, mobile_number) FROM stdin;
+4786522457	Taghi	Mamoli	4526785245  
+5426782459	Mobile	Me	9145874682  
+\.
+
+
+--
+-- Data for Name: bike_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.bike_log (national_code, first_name, last_name, mobile_number, log_time, action) FROM stdin;
+5426782459	Mobile	Me	9145874682  	2020-02-01 04:39:31.267224	insert
+\.
+
+
+--
+-- Data for Name: customer; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.customer (national_code, first_name, last_name, mobile_number, age) FROM stdin;
+1548526785	Alireza	Mazochi	9745826453  	20
+7584532965	Iraj	Ghofrani	145852464   	18
+1452587564	Just for	Only for	9145346782  	20
+\.
+
+
+--
+-- Data for Name: customer_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.customer_log (id, national_code, first_name, last_name, mobile_number, age, log_time, action) FROM stdin;
+\.
+
+
+--
+-- Data for Name: delivery; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.delivery (factor_id, address_phone, bike_delivery_national_code) FROM stdin;
+\.
+
+
+--
+-- Data for Name: delivery_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.delivery_log (id, factor_id, address_phone, bike_delivery_national_code, log_time, action) FROM stdin;
+\.
+
+
+--
+-- Data for Name: factor_address; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.factor_address (factor_id, address_phone) FROM stdin;
+2	4856217
+1	5577435
+\.
+
+
+--
+-- Data for Name: factor_address_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.factor_address_log (id, factor_id, address_phone, log_time, action) FROM stdin;
+\.
+
+
+--
+-- Data for Name: factor_customer; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.factor_customer (factor_id, customer_national_code) FROM stdin;
+2	1548526785
+\.
+
+
+--
+-- Data for Name: factor_customer_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.factor_customer_log (id, factor_id, customer_national_code, log_time, action) FROM stdin;
+\.
+
+
+--
+-- Data for Name: factor_ingredient; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.factor_ingredient (factor_id, ingredient_name, ingredient_start_time, quantity) FROM stdin;
+1	Shalgam	2000-08-09	4
+2	Shalgam	2000-08-09	1
+\.
+
+
+--
+-- Data for Name: factor_ingredient_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.factor_ingredient_log (id, factor_id, ingredient_name, ingredient_start_time, log_time, action) FROM stdin;
+\.
+
+
+--
+-- Data for Name: factor_of_food; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.factor_of_food (id, date) FROM stdin;
+1	2020-01-31
+2	2020-01-31
+\.
+
+
+--
+-- Data for Name: factor_of_food_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.factor_of_food_log (id, date, log_time, action) FROM stdin;
+\.
+
+
+--
+-- Data for Name: factor_of_ingredient; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.factor_of_ingredient (id, date) FROM stdin;
+1	2020-01-31
+2	2020-01-31
+\.
+
+
+--
+-- Data for Name: factor_of_ingredient_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.factor_of_ingredient_log (id, date, log_time, action) FROM stdin;
+\.
+
+
+--
+-- Data for Name: food; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.food (name, price, name_start_time, name_end_time, price_start_time, price_end_time) FROM stdin;
+Kabab	15.00	1000-05-09	2020-01-31	1000-05-09	2020-01-31
+Shalgam PLUS Piaz	27.00	1000-04-08	2020-01-31	1000-04-08	2020-01-31
+Jooje	13.00	1000-08-09	2020-01-31	2000-08-09	2020-01-31
+Geyme Gorme	52.00	1200-12-12	1200-12-12	1200-12-12	2800-09-08
+Pizza	16.00	2015-07-08	2020-07-08	2015-07-08	2020-07-08
+\.
+
+
+--
+-- Data for Name: food_factor; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.food_factor (factor_int, food_name, food_name_start_time, food_price_start_time, quantity) FROM stdin;
+1	Pizza	2015-07-08	2015-07-08	4
+2	Pizza	2015-07-08	2015-07-08	5
+\.
+
+
+--
+-- Data for Name: food_factor_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.food_factor_log (id, factor_int, food_name, food_name_start_time, food_price_start_time, log_time, action) FROM stdin;
+\.
+
+
+--
+-- Data for Name: food_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.food_log (id, name, price, name_start_time, name_end_time, price_start_time, price_end_time, log_time, action) FROM stdin;
+\.
+
+
+--
+-- Data for Name: ingredient; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.ingredient (name, price, start_time, end_time) FROM stdin;
+Shalgam	15.00	2000-08-09	2020-02-01
+Hulo	43.00	1990-08-07	2020-02-01
+Jafari	10.00	2019-09-08	2020-02-01
+Reyhan	16.00	2018-09-08	2020-02-01
+Avishan	25.00	1990-08-07	2020-02-01
+Nana	20.00	1905-04-08	2030-05-07
+\.
+
+
+--
+-- Data for Name: ingredient_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.ingredient_log (id, name, price, start_time, end_time, log_time, action) FROM stdin;
+1	Jafari	10.00	2019-09-08	2020-03-04	2020-02-01 05:38:10.079955	insert
+2	Reyhan	16.00	2018-09-08	2022-03-04	2020-02-01 05:38:28.522634	insert
+3	Jafari	10.00	2019-09-08	2020-02-01	2020-02-01 05:39:23.258213	update
+4	Reyhan	16.00	2018-09-08	2020-02-01	2020-02-01 05:39:29.429272	update
+5	Avishan	25.00	1990-08-07	2020-02-01	2020-02-01 05:39:32.550536	update
+6	Nana	10.00	1905-04-08	2030-05-07	2020-02-01 05:51:26.927762	insert
+7	Nana	20.00	1905-04-08	2030-05-07	2020-02-01 05:52:09.163075	update
+\.
+
+
+--
+-- Data for Name: store; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.store (name, start_time, end_time) FROM stdin;
+Shams	1000-05-06	2020-02-01
+\.
+
+
+--
+-- Data for Name: store_factor; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.store_factor (factor_id, store_name, store_start_time) FROM stdin;
+2	Shams	1000-05-06
+1	Shams	1000-05-06
+\.
+
+
+--
+-- Data for Name: store_factor_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.store_factor_log (id, factor_id, store_name, store_start_time, log_time, action) FROM stdin;
+1	1	Shams	1000-05-06	2020-02-01 05:39:56.517032	update
+\.
+
+
+--
+-- Data for Name: store_ingredient; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.store_ingredient (store_name, store_start_time, ingredient_name, ingredient_start_time) FROM stdin;
+Shams	1000-05-06	Shalgam	2000-08-09
+Shams	1000-05-06	Hulo	1990-08-07
+Shams	1000-05-06	Avishan	1990-08-07
+Shams	1000-05-06	Jafari	2019-09-08
+Shams	1000-05-06	Reyhan	2018-09-08
+Shams	1000-05-06	Nana	1905-04-08
+\.
+
+
+--
+-- Data for Name: store_ingredient_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.store_ingredient_log (id, store_name, store_start_time, ingredient_name, ingredient_start_time, log_time, action) FROM stdin;
+1	Shams	1000-05-06	Jafari	2019-09-08	2020-02-01 05:38:10.169411	insert
+2	Shams	1000-05-06	Reyhan	2018-09-08	2020-02-01 05:38:28.635172	insert
+3	Shams	1000-05-06	Nana	1905-04-08	2020-02-01 05:51:26.980335	insert
+\.
+
+
+--
+-- Data for Name: store_log; Type: TABLE DATA; Schema: public; Owner: engmrgh
+--
+
+COPY public.store_log (id, name, start_time, end_time, log_time, action) FROM stdin;
+1	Shams	1000-05-06	2020-02-01	2020-02-01 06:11:20.715706	update
+\.
+
+
+--
+-- Name: address_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.address_log_id_seq', 1, false);
+
+
+--
+-- Name: customer_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.customer_log_id_seq', 1, false);
+
+
+--
+-- Name: delivery_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.delivery_log_id_seq', 1, false);
+
+
+--
+-- Name: factor_address_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.factor_address_log_id_seq', 1, false);
+
+
+--
+-- Name: factor_customer_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.factor_customer_log_id_seq', 1, false);
+
+
+--
+-- Name: factor_ingredient_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.factor_ingredient_log_id_seq', 1, false);
+
+
+--
+-- Name: factor_of_food_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.factor_of_food_id_seq', 2, true);
+
+
+--
+-- Name: factor_of_food_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.factor_of_food_log_id_seq', 1, false);
+
+
+--
+-- Name: factor_of_ingredient_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.factor_of_ingredient_id_seq', 2, true);
+
+
+--
+-- Name: factor_of_ingredient_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.factor_of_ingredient_log_id_seq', 1, false);
+
+
+--
+-- Name: food_factor_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.food_factor_log_id_seq', 1, false);
+
+
+--
+-- Name: food_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.food_log_id_seq', 1, false);
+
+
+--
+-- Name: ingredient_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.ingredient_log_id_seq', 7, true);
+
+
+--
+-- Name: store_factor_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.store_factor_log_id_seq', 1, true);
+
+
+--
+-- Name: store_ingredient_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.store_ingredient_log_id_seq', 3, true);
+
+
+--
+-- Name: store_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: engmrgh
+--
+
+SELECT pg_catalog.setval('public.store_log_id_seq', 1, true);
+
+
+--
+-- Name: address_log address_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.address_log
+    ADD CONSTRAINT address_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: address address_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.address
+    ADD CONSTRAINT address_pkey PRIMARY KEY (phone);
+
+
+--
+-- Name: bike_log bike_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.bike_log
+    ADD CONSTRAINT bike_log_pkey PRIMARY KEY (national_code);
+
+
+--
+-- Name: bike bike_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.bike
+    ADD CONSTRAINT bike_pkey PRIMARY KEY (national_code);
+
+
+--
+-- Name: customer_log customer_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.customer_log
+    ADD CONSTRAINT customer_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: customer customer_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.customer
+    ADD CONSTRAINT customer_pkey PRIMARY KEY (national_code);
+
+
+--
+-- Name: delivery_log delivery_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.delivery_log
+    ADD CONSTRAINT delivery_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: delivery delivery_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.delivery
+    ADD CONSTRAINT delivery_pkey PRIMARY KEY (factor_id);
+
+
+--
+-- Name: factor_address_log factor_address_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_address_log
+    ADD CONSTRAINT factor_address_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: factor_address factor_address_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_address
+    ADD CONSTRAINT factor_address_pkey PRIMARY KEY (factor_id);
+
+
+--
+-- Name: factor_customer_log factor_customer_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_customer_log
+    ADD CONSTRAINT factor_customer_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: factor_customer factor_customer_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_customer
+    ADD CONSTRAINT factor_customer_pkey PRIMARY KEY (factor_id);
+
+
+--
+-- Name: factor_ingredient_log factor_ingredient_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_ingredient_log
+    ADD CONSTRAINT factor_ingredient_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: factor_ingredient factor_ingredient_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_ingredient
+    ADD CONSTRAINT factor_ingredient_pkey PRIMARY KEY (factor_id, ingredient_name, ingredient_start_time);
+
+
+--
+-- Name: factor_of_food_log factor_of_food_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_of_food_log
+    ADD CONSTRAINT factor_of_food_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: factor_of_food factor_of_food_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_of_food
+    ADD CONSTRAINT factor_of_food_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: factor_of_ingredient_log factor_of_ingredient_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_of_ingredient_log
+    ADD CONSTRAINT factor_of_ingredient_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: factor_of_ingredient factor_of_ingredient_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_of_ingredient
+    ADD CONSTRAINT factor_of_ingredient_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: food_factor_log food_factor_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.food_factor_log
+    ADD CONSTRAINT food_factor_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: food_factor food_factor_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.food_factor
+    ADD CONSTRAINT food_factor_pkey PRIMARY KEY (factor_int, food_name, food_name_start_time);
+
+
+--
+-- Name: food_log food_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.food_log
+    ADD CONSTRAINT food_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: food food_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.food
+    ADD CONSTRAINT food_pkey PRIMARY KEY (name, name_start_time, price_start_time);
+
+
+--
+-- Name: ingredient_log ingredient_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.ingredient_log
+    ADD CONSTRAINT ingredient_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ingredient ingredient_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.ingredient
+    ADD CONSTRAINT ingredient_pkey PRIMARY KEY (name, start_time);
+
+
+--
+-- Name: store_factor_log store_factor_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store_factor_log
+    ADD CONSTRAINT store_factor_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: store_factor store_factor_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store_factor
+    ADD CONSTRAINT store_factor_pkey PRIMARY KEY (factor_id);
+
+
+--
+-- Name: store_ingredient_log store_ingredient_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store_ingredient_log
+    ADD CONSTRAINT store_ingredient_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: store_ingredient store_ingredient_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store_ingredient
+    ADD CONSTRAINT store_ingredient_pkey PRIMARY KEY (store_name, store_start_time, ingredient_name, ingredient_start_time);
+
+
+--
+-- Name: store_log store_log_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store_log
+    ADD CONSTRAINT store_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: store store_pkey; Type: CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store
+    ADD CONSTRAINT store_pkey PRIMARY KEY (name, start_time);
+
+
+--
+-- Name: address delete_address_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_address_log_trigger AFTER DELETE ON public.address FOR EACH ROW EXECUTE PROCEDURE public.delete_address_log();
+
+
+--
+-- Name: bike delete_bike_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_bike_log_trigger AFTER DELETE ON public.bike FOR EACH ROW EXECUTE PROCEDURE public.delete_bike_log();
+
+
+--
+-- Name: customer delete_customer_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_customer_log_trigger AFTER DELETE ON public.customer FOR EACH ROW EXECUTE PROCEDURE public.delete_customer_log();
+
+
+--
+-- Name: factor_of_food delete_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_factor_log_trigger AFTER DELETE ON public.factor_of_food FOR EACH ROW EXECUTE PROCEDURE public.delete_food_factor_log();
+
+
+--
+-- Name: food delete_food_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_food_log_trigger AFTER DELETE ON public.food FOR EACH ROW EXECUTE PROCEDURE public.delete_food_log();
+
+
+--
+-- Name: ingredient delete_material_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_material_log_trigger AFTER DELETE ON public.ingredient FOR EACH ROW EXECUTE PROCEDURE public.delete_ingredient_log();
+
+
+--
+-- Name: factor_of_ingredient delete_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_store_factor_log_trigger AFTER DELETE ON public.factor_of_ingredient FOR EACH ROW EXECUTE PROCEDURE public.delete_ingredient_factor_log();
+
+
+--
+-- Name: delivery delete_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_store_factor_log_trigger AFTER DELETE ON public.delivery FOR EACH ROW EXECUTE PROCEDURE public.delete_delivery_log();
+
+
+--
+-- Name: factor_address delete_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_store_factor_log_trigger AFTER DELETE ON public.factor_address FOR EACH ROW EXECUTE PROCEDURE public.delete_factor_address_log();
+
+
+--
+-- Name: factor_customer delete_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_store_factor_log_trigger AFTER DELETE ON public.factor_customer FOR EACH ROW EXECUTE PROCEDURE public.delete_factor_customer_log();
+
+
+--
+-- Name: factor_ingredient delete_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_store_factor_log_trigger AFTER DELETE ON public.factor_ingredient FOR EACH ROW EXECUTE PROCEDURE public.delete_factor_ingredient_log();
+
+
+--
+-- Name: store_factor delete_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_store_factor_log_trigger AFTER DELETE ON public.store_factor FOR EACH ROW EXECUTE PROCEDURE public.delete_store_factor_log();
+
+
+--
+-- Name: store_ingredient delete_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_store_factor_log_trigger AFTER DELETE ON public.store_ingredient FOR EACH ROW EXECUTE PROCEDURE public.delete_store_ingredient_log();
+
+
+--
+-- Name: store delete_store_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER delete_store_log_trigger AFTER DELETE ON public.store FOR EACH ROW EXECUTE PROCEDURE public.delete_store_log();
+
+
+--
+-- Name: bike insert_bike_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_bike_log_trigger AFTER INSERT ON public.bike FOR EACH ROW EXECUTE PROCEDURE public.insert_bike_log();
+
+
+--
+-- Name: customer insert_customer_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_customer_log_trigger AFTER INSERT ON public.customer FOR EACH ROW EXECUTE PROCEDURE public.insert_customer_log();
+
+
+--
+-- Name: address insert_customer_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_customer_log_trigger AFTER INSERT ON public.address FOR EACH ROW EXECUTE PROCEDURE public.insert_address_log();
+
+
+--
+-- Name: factor_of_food insert_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_factor_log_trigger AFTER INSERT ON public.factor_of_food FOR EACH ROW EXECUTE PROCEDURE public.insert_food_factor_log();
+
+
+--
+-- Name: food insert_food_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_food_log_trigger AFTER INSERT ON public.food FOR EACH ROW EXECUTE PROCEDURE public.insert_food_log();
+
+
+--
+-- Name: ingredient insert_material_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_material_log_trigger AFTER INSERT ON public.ingredient FOR EACH ROW EXECUTE PROCEDURE public.insert_ingredient_log();
+
+
+--
+-- Name: factor_of_ingredient insert_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_store_factor_log_trigger AFTER INSERT ON public.factor_of_ingredient FOR EACH ROW EXECUTE PROCEDURE public.insert_ingredient_factor_log();
+
+
+--
+-- Name: delivery insert_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_store_factor_log_trigger AFTER INSERT ON public.delivery FOR EACH ROW EXECUTE PROCEDURE public.insert_delivery_log();
+
+
+--
+-- Name: factor_address insert_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_store_factor_log_trigger AFTER INSERT ON public.factor_address FOR EACH ROW EXECUTE PROCEDURE public.insert_factor_address_log();
+
+
+--
+-- Name: factor_customer insert_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_store_factor_log_trigger AFTER INSERT ON public.factor_customer FOR EACH ROW EXECUTE PROCEDURE public.insert_factor_customer_log();
+
+
+--
+-- Name: factor_ingredient insert_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_store_factor_log_trigger AFTER INSERT ON public.factor_ingredient FOR EACH ROW EXECUTE PROCEDURE public.insert_factor_ingredient_log();
+
+
+--
+-- Name: store_factor insert_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_store_factor_log_trigger AFTER INSERT ON public.store_factor FOR EACH ROW EXECUTE PROCEDURE public.insert_store_factor_log();
+
+
+--
+-- Name: store_ingredient insert_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_store_factor_log_trigger AFTER INSERT ON public.store_ingredient FOR EACH ROW EXECUTE PROCEDURE public.insert_store_ingredient_log();
+
+
+--
+-- Name: store insert_store_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER insert_store_log_trigger AFTER INSERT ON public.store FOR EACH ROW EXECUTE PROCEDURE public.insert_store_log();
+
+
+--
+-- Name: address update_address_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_address_log_trigger AFTER UPDATE ON public.address FOR EACH ROW EXECUTE PROCEDURE public.update_address_log();
+
+
+--
+-- Name: bike update_bike_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_bike_log_trigger AFTER UPDATE ON public.bike FOR EACH ROW EXECUTE PROCEDURE public.update_bike_log();
+
+
+--
+-- Name: customer update_customer_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_customer_log_trigger AFTER UPDATE ON public.customer FOR EACH ROW EXECUTE PROCEDURE public.update_customer_log();
+
+
+--
+-- Name: factor_of_food update_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_factor_log_trigger AFTER UPDATE ON public.factor_of_food FOR EACH ROW EXECUTE PROCEDURE public.update_food_factor_log();
+
+
+--
+-- Name: food update_food_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_food_log_trigger AFTER UPDATE ON public.food FOR EACH ROW EXECUTE PROCEDURE public.update_food_log();
+
+
+--
+-- Name: ingredient update_material_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_material_log_trigger AFTER UPDATE ON public.ingredient FOR EACH ROW EXECUTE PROCEDURE public.update_ingredient_log();
+
+
+--
+-- Name: factor_of_ingredient update_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_store_factor_log_trigger AFTER UPDATE ON public.factor_of_ingredient FOR EACH ROW EXECUTE PROCEDURE public.update_ingredient_factor_log();
+
+
+--
+-- Name: delivery update_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_store_factor_log_trigger AFTER UPDATE ON public.delivery FOR EACH ROW EXECUTE PROCEDURE public.update_delivery_log();
+
+
+--
+-- Name: factor_address update_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_store_factor_log_trigger AFTER UPDATE ON public.factor_address FOR EACH ROW EXECUTE PROCEDURE public.update_factor_address_log();
+
+
+--
+-- Name: factor_customer update_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_store_factor_log_trigger AFTER UPDATE ON public.factor_customer FOR EACH ROW EXECUTE PROCEDURE public.update_factor_customer_log();
+
+
+--
+-- Name: factor_ingredient update_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_store_factor_log_trigger AFTER UPDATE ON public.factor_ingredient FOR EACH ROW EXECUTE PROCEDURE public.update_factor_ingredient_log();
+
+
+--
+-- Name: store_factor update_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_store_factor_log_trigger AFTER UPDATE ON public.store_factor FOR EACH ROW EXECUTE PROCEDURE public.update_store_factor_log();
+
+
+--
+-- Name: store_ingredient update_store_factor_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_store_factor_log_trigger AFTER UPDATE ON public.store_ingredient FOR EACH ROW EXECUTE PROCEDURE public.update_store_ingredient_log();
+
+
+--
+-- Name: store update_store_log_trigger; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER update_store_log_trigger AFTER UPDATE ON public.store FOR EACH ROW EXECUTE PROCEDURE public.update_store_log();
+
+
+--
+-- Name: address validate_address_phone; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER validate_address_phone BEFORE INSERT ON public.address FOR EACH ROW EXECUTE PROCEDURE public.check_phone();
+
+
+--
+-- Name: bike validate_bike_delivery_mobile_number; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER validate_bike_delivery_mobile_number BEFORE INSERT ON public.bike FOR EACH ROW EXECUTE PROCEDURE public.check_mobile();
+
+
+--
+-- Name: customer validate_customer_mobile_number; Type: TRIGGER; Schema: public; Owner: engmrgh
+--
+
+CREATE TRIGGER validate_customer_mobile_number BEFORE INSERT ON public.customer FOR EACH ROW EXECUTE PROCEDURE public.check_mobile();
+
+
+--
+-- Name: address address_customer_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.address
+    ADD CONSTRAINT address_customer_fkey FOREIGN KEY (customer) REFERENCES public.customer(national_code);
+
+
+--
+-- Name: delivery delivery_address_phone_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.delivery
+    ADD CONSTRAINT delivery_address_phone_fkey FOREIGN KEY (address_phone) REFERENCES public.address(phone);
+
+
+--
+-- Name: delivery delivery_bike_delivery_national_code_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.delivery
+    ADD CONSTRAINT delivery_bike_delivery_national_code_fkey FOREIGN KEY (bike_delivery_national_code) REFERENCES public.bike(national_code);
+
+
+--
+-- Name: delivery delivery_factor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.delivery
+    ADD CONSTRAINT delivery_factor_id_fkey FOREIGN KEY (factor_id) REFERENCES public.factor_of_food(id);
+
+
+--
+-- Name: factor_address factor_address_address_phone_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_address
+    ADD CONSTRAINT factor_address_address_phone_fkey FOREIGN KEY (address_phone) REFERENCES public.address(phone);
+
+
+--
+-- Name: factor_address factor_address_factor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_address
+    ADD CONSTRAINT factor_address_factor_id_fkey FOREIGN KEY (factor_id) REFERENCES public.factor_of_food(id);
+
+
+--
+-- Name: factor_customer factor_customer_customer_national_code_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_customer
+    ADD CONSTRAINT factor_customer_customer_national_code_fkey FOREIGN KEY (customer_national_code) REFERENCES public.customer(national_code);
+
+
+--
+-- Name: factor_customer factor_customer_factor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_customer
+    ADD CONSTRAINT factor_customer_factor_id_fkey FOREIGN KEY (factor_id) REFERENCES public.factor_of_food(id);
+
+
+--
+-- Name: factor_ingredient factor_ingredient_factor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_ingredient
+    ADD CONSTRAINT factor_ingredient_factor_id_fkey FOREIGN KEY (factor_id) REFERENCES public.factor_of_ingredient(id);
+
+
+--
+-- Name: factor_ingredient factor_ingredient_ingredient_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.factor_ingredient
+    ADD CONSTRAINT factor_ingredient_ingredient_name_fkey FOREIGN KEY (ingredient_name, ingredient_start_time) REFERENCES public.ingredient(name, start_time);
+
+
+--
+-- Name: food_factor food_factor_factor_int_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.food_factor
+    ADD CONSTRAINT food_factor_factor_int_fkey FOREIGN KEY (factor_int) REFERENCES public.factor_of_food(id);
+
+
+--
+-- Name: food_factor food_factor_food_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.food_factor
+    ADD CONSTRAINT food_factor_food_name_fkey FOREIGN KEY (food_name, food_name_start_time, food_price_start_time) REFERENCES public.food(name, name_start_time, price_start_time);
+
+
+--
+-- Name: store_factor store_factor_factor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store_factor
+    ADD CONSTRAINT store_factor_factor_id_fkey FOREIGN KEY (factor_id) REFERENCES public.factor_of_ingredient(id);
+
+
+--
+-- Name: store_factor store_factor_store_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store_factor
+    ADD CONSTRAINT store_factor_store_name_fkey FOREIGN KEY (store_name, store_start_time) REFERENCES public.store(name, start_time);
+
+
+--
+-- Name: store_ingredient store_ingredient_ingredient_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store_ingredient
+    ADD CONSTRAINT store_ingredient_ingredient_name_fkey FOREIGN KEY (ingredient_name, ingredient_start_time) REFERENCES public.ingredient(name, start_time);
+
+
+--
+-- Name: store_ingredient store_ingredient_store_name_fkey; Type: FK CONSTRAINT; Schema: public; Owner: engmrgh
+--
+
+ALTER TABLE ONLY public.store_ingredient
+    ADD CONSTRAINT store_ingredient_store_name_fkey FOREIGN KEY (store_name, store_start_time) REFERENCES public.store(name, start_time);
+
+
+--
+-- Name: job cron_job_policy; Type: POLICY; Schema: cron; Owner: engmrgh
+--
+
+CREATE POLICY cron_job_policy ON cron.job USING ((username = (CURRENT_USER)::text));
+
+
+--
+-- Name: job; Type: ROW SECURITY; Schema: cron; Owner: engmrgh
+--
+
+ALTER TABLE cron.job ENABLE ROW LEVEL SECURITY;
+
+--
+-- PostgreSQL database dump complete
+--
+

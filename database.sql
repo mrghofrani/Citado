@@ -532,7 +532,7 @@ CREATE TRIGGER delete_food_factor_log_trigger AFTER DELETE ON food_factor
 CREATE OR REPLACE FUNCTION insert_store_log()
   RETURNS trigger AS $$
           BEGIN
-            INSERT INTO store(name, start_time, end_time, action)
+            INSERT INTO store_log(name, start_time, end_time, action)
             VALUES(NEW.name, NEW.start_time, NEW.end_time ,'insert');
             RETURN NEW;
         END;
@@ -541,7 +541,7 @@ CREATE OR REPLACE FUNCTION insert_store_log()
 CREATE OR REPLACE FUNCTION update_store_log()
   RETURNS trigger AS $$
           BEGIN
-            INSERT INTO store(name, start_time, end_time, action)
+            INSERT INTO store_log(name, start_time, end_time, action)
             VALUES(NEW.name, NEW.start_time, NEW.end_time ,'update');
             RETURN NEW;
         END;
@@ -550,7 +550,7 @@ CREATE OR REPLACE FUNCTION update_store_log()
 CREATE OR REPLACE FUNCTION delete_store_log()
   RETURNS trigger AS $$
           BEGIN
-            INSERT INTO store(name, start_time, end_time, action)
+            INSERT INTO store_log(name, start_time, end_time, action)
             VALUES(NEW.name, NEW.start_time, NEW.end_time ,'delete');
             RETURN OLD;
         END;
@@ -843,4 +843,21 @@ CREATE TRIGGER update_store_factor_log_trigger AFTER UPDATE ON store_ingredient
     FOR EACH ROW EXECUTE PROCEDURE update_store_ingredient_log();
 CREATE TRIGGER delete_store_factor_log_trigger AFTER DELETE ON store_ingredient
     FOR EACH ROW EXECUTE PROCEDURE delete_store_ingredient_log();
+
+CREATE EXTENSION pg_cron;
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM address_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM bike_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM customer_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM delivery_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM factor_address_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM factor_customer_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM factor_ingredient_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM factor_of_food_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM factor_of_ingredient_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM food_factor_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM food_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM ingredient_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM store_factor_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM store_ingredient_log WHERE event_time < now() - interval '3 day'$$);
+SELECT cron.schedule('0 0 * * *', $$DELETE FROM store_log WHERE event_time < now() - interval '3 day'$$);
 

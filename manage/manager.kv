@@ -1,0 +1,63 @@
+<ManagePopup>:
+    orientation: 'vertical'
+    BoxLayout:
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                id: drop_customer
+                text: 'Drop customer'
+                on_release: root.drop_customer()
+            Button:
+                id: create_customer
+                text: 'Create customer'
+                on_release: root.create_customer()
+
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                id: drop_address
+                text: 'drop address'
+                on_release: root.drop_address()
+            Button:
+                id: create_address
+                text: 'create address'
+                on_release: root.create_address()
+
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                id: drop_bike
+                text: 'Create bike'
+                on_release: root.drop_customer()
+            Button:
+                id: create_food
+                text: 'Create food'
+                on_release: root.create_customer()
+
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                id: drop_ingredient
+                text: 'drop ingredient'
+                on_release: root.drop_ingredient()
+            Button:
+                id: create_ingredient
+                text: 'Create ingredient'
+                on_release: root.create_ingredient()
+
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                id: drop_store
+                text: 'drop store'
+                on_release: root.drop_store()
+            Button:
+                id: create_store
+                text: 'Create store'
+                on_release: root.create_store
+
+    Button:
+        id: exit
+        text: 'exit'
+
+

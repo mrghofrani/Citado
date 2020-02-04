@@ -28,7 +28,7 @@
             Button:
                 id: manage_db
                 text: 'Manage DB'
-                on_press: print("Pressed")
+                on_press: root.manage_button()
 
         Button:
             id: order_food
@@ -102,6 +102,7 @@
             Button:
                 id: delete_store
                 text: 'Delete store'
+                on_release: root.delete_store_button()
 
             Button:
                 id: delete_address

@@ -19,6 +19,7 @@ from delete.customer.customer import show_delete_customer_popup
 from delete.biker.biker import show_delete_biker_popup
 from delete.food.food import show_delete_food_popup
 from delete.ingredient.ingredient import show_delete_ingredient_popup
+from delete.store.store import show_delete_store_popup
 
 from order.food.food import show_food_order_popup
 from order.ingredient.ingredient import show_ingredient_order_popup
@@ -27,6 +28,8 @@ from report.admin.admin import show_admin_report_popup
 from report.user.user import show_user_report_popup
 
 from log.log import show_log_popup
+
+from manage.manager import show_manager_popup
 
 
 class MainLayout(BoxLayout):
@@ -87,6 +90,9 @@ class MainLayout(BoxLayout):
     def delete_ingredient_button(self):
         show_delete_ingredient_popup()
 
+    def delete_store_button(self):
+        show_delete_store_popup()
+
 # ---------- Report ----------
     def admin_report_button(self):
         show_admin_report_popup()
@@ -96,6 +102,9 @@ class MainLayout(BoxLayout):
 
     def log_button(self):
         show_log_popup()
+
+    def manage_button(self):
+        show_manager_popup()
         
 
 class MainPage(App):
